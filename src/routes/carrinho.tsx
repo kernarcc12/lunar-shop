@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Trash2, ShoppingBag, MessageCircle } from "lucide-react";
+import { Trash2, ShoppingBag, MessageCircle, Check } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { brl, getProduto } from "@/data/products";
@@ -39,10 +39,37 @@ export const Route = createFileRoute("/carrinho")({
 function Carrinho() {
   const items = useCart();
   const [pedidoFeito, setPedidoFeito] = useState(false);
+  const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
 
   const linhas = items
     .map((i) => ({ item: i, produto: getProduto(i.id) }))
     .filter((l) => l.produto);
+
+  const todosIds = linhas.map((l) => l.item.id);
+  const todosSelecionados = linhas.length > 0 && linhas.every((l) => selecionados.has(l.item.id));
+
+  function toggleSelecionar(id: string) {
+    setSelecionados((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  function toggleTodos() {
+    if (todosSelecionados) {
+      setSelecionados(new Set());
+    } else {
+      setSelecionados(new Set(todosIds));
+    }
+  }
+
+  const linhasFiltradas = linhas.filter((l) => selecionados.has(l.item.id));
+  const totalSelecionado = linhasFiltradas.reduce((s, l) => s + l.produto!.preco * l.item.qtd, 0);
   const total = linhas.reduce((s, l) => s + l.produto!.preco * l.item.qtd, 0);
 
   return (
@@ -79,11 +106,39 @@ function Carrinho() {
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <div className="space-y-4">
+              <label className="flex items-center gap-3 rounded-lg border border-border bg-card p-4 cursor-pointer hover:bg-accent transition-colors">
+                <div
+                  onClick={toggleTodos}
+                  className={`flex h-5 w-5 items-center justify-center rounded border-2 cursor-pointer transition-colors ${
+                    todosSelecionados
+                      ? "border-gold bg-gold text-brand"
+                      : "border-border bg-background"
+                  }`}
+                >
+                  {todosSelecionados && <Check className="h-3.5 w-3.5" />}
+                </div>
+                <span className="text-sm font-medium text-foreground">
+                  Selecionar todos ({linhas.length} itens)
+                </span>
+              </label>
+
               {linhas.map(({ item, produto }) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 rounded-lg border border-border bg-card p-4"
+                  className={`flex gap-4 rounded-lg border bg-card p-4 transition-colors ${
+                    selecionados.has(item.id) ? "border-gold" : "border-border"
+                  }`}
                 >
+                  <div
+                    onClick={() => toggleSelecionar(item.id)}
+                    className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 cursor-pointer transition-colors self-start ${
+                      selecionados.has(item.id)
+                        ? "border-gold bg-gold text-brand"
+                        : "border-border bg-background"
+                    }`}
+                  >
+                    {selecionados.has(item.id) && <Check className="h-3.5 w-3.5" />}
+                  </div>
                   <img
                     src={produto!.imagem}
                     alt={produto!.nome}
@@ -150,17 +205,27 @@ function Carrinho() {
               <p className="mt-1 text-sm text-success">em 12x {brl(total / 12)} sem juros</p>
               <button
                 onClick={() => {
+                  const itensParaEnviar = linhasFiltradas.length > 0
+                    ? linhasFiltradas
+                    : linhas;
                   const whatsappUrl = buildCartWhatsAppLink(
-                    linhas.map((l) => ({ produto: l.produto!, qtd: l.item.qtd })),
+                    itensParaEnviar.map((l) => ({ produto: l.produto!, qtd: l.item.qtd })),
                   );
                   window.open(whatsappUrl, "_blank");
-                  clearCart();
+                  if (linhasFiltradas.length > 0) {
+                    linhasFiltradas.forEach((l) => removeFromCart(l.item.id));
+                  } else {
+                    clearCart();
+                  }
                   setPedidoFeito(true);
                 }}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-green-500 py-3 font-medium text-white hover:bg-green-600"
+                disabled={linhasFiltradas.length === 0}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-green-500 py-3 font-medium text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <MessageCircle className="h-5 w-5" />
-                Finalizar compra pelo WhatsApp
+                {linhasFiltradas.length > 0
+                  ? `Finalizar ${linhasFiltradas.length} itens selecionados`
+                  : "Finalizar compra pelo WhatsApp"}
               </button>
             </aside>
           </div>
