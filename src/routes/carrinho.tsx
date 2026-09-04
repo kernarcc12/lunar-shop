@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trash2, ShoppingBag, MessageCircle, Check } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
-import { brl, getProduto } from "@/data/products";
+import { brl, type Product } from "@/data/products";
+import { supabase } from "@/lib/supabase";
 import { clearCart, removeFromCart, setQty, useCart } from "@/lib/cart";
 
 const WHATSAPP_NUMBER = "5587996233203";
@@ -40,9 +41,26 @@ function Carrinho() {
   const items = useCart();
   const [pedidoFeito, setPedidoFeito] = useState(false);
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
+  const [produtosMap, setProdutosMap] = useState<Map<string, Product>>(new Map());
+
+  useEffect(() => {
+    async function carregarProdutos() {
+      if (items.length === 0) return;
+      const ids = items.map((i) => i.id);
+      const { data } = await supabase
+        .from("produtos")
+        .select("*")
+        .in("id", ids);
+      if (data) {
+        const map = new Map(data.map((p) => [p.id, p]));
+        setProdutosMap(map);
+      }
+    }
+    carregarProdutos();
+  }, [items]);
 
   const linhas = items
-    .map((i) => ({ item: i, produto: getProduto(i.id) }))
+    .map((i) => ({ item: i, produto: produtosMap.get(i.id) || null }))
     .filter((l) => l.produto);
 
   const todosIds = linhas.map((l) => l.item.id);
