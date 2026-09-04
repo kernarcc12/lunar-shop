@@ -1,44 +1,78 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { Star, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
 import { WhatsAppButton } from "@/components/store/WhatsAppButton";
-import { brl, getProduto, produtos } from "@/data/products";
+import { brl, type Product } from "@/data/products";
+import { supabase } from "@/lib/supabase";
 import { addToCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/produto/$id")({
-  loader: ({ params }) => {
-    const produto = getProduto(params.id);
-    if (!produto) throw notFound();
-    return { produto };
-  },
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return {
-        meta: [
-          { title: "Produto indisponível | Lunar Produtos" },
-          { name: "robots", content: "noindex" },
-        ],
-      };
-    }
-    const { produto } = loaderData;
-    return {
-      meta: [
-        { title: `${produto.nome} | Lunar Produtos` },
-        { name: "description", content: produto.descricao },
-        { property: "og:title", content: `${produto.nome} — ${brl(produto.preco)}` },
-        { property: "og:description", content: produto.descricao },
-      ],
-    };
-  },
+  head: () => ({
+    meta: [
+      { title: "Produto | Lunar Produtos" },
+    ],
+  }),
   component: ProdutoPage,
 });
 
 function ProdutoPage() {
-  const { produto } = Route.useLoaderData();
+  const { id } = Route.useParams();
   const navigate = useNavigate();
-  const relacionados = produtos.filter((p) => p.id !== produto.id).slice(0, 4);
+  const [produto, setProduto] = useState<Product | null>(null);
+  const [relacionados, setRelacionados] = useState<Product[]>([]);
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    async function carregar() {
+      const { data } = await supabase
+        .from("produtos")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (data) {
+        setProduto(data);
+        const { data: todos } = await supabase
+          .from("produtos")
+          .select("*")
+          .neq("id", id)
+          .limit(4);
+        setRelacionados(todos || []);
+      }
+      setCarregando(false);
+    }
+    carregar();
+  }, [id]);
+
+  if (carregando) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-7xl px-4 py-16 text-center">
+          <p className="text-muted-foreground">Carregando produto...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!produto) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-7xl px-4 py-16 text-center">
+          <h1 className="text-2xl font-semibold text-foreground">Produto não encontrado</h1>
+          <Link to="/" className="mt-4 inline-block text-gold hover:underline">
+            Voltar à loja
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
