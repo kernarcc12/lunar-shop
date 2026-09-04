@@ -1,6 +1,6 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Star, Truck, ShieldCheck, RotateCcw } from "lucide-react";
+import { Star, Truck, ShieldCheck, RotateCcw, Send } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
@@ -8,6 +8,36 @@ import { WhatsAppButton } from "@/components/store/WhatsAppButton";
 import { brl, type Product } from "@/data/products";
 import { supabase } from "@/lib/supabase";
 import { addToCart } from "@/lib/cart";
+
+type Avaliacao = {
+  id: string;
+  produtoId: string;
+  nome: string;
+  estrelas: number;
+  comentario: string;
+  data: string;
+};
+
+const REVIEWS_KEY = "lunar-avaliacoes";
+
+function carregarAvaliacoes(produtoId: string): Avaliacao[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(REVIEWS_KEY);
+    if (!raw) return [];
+    const todas: Avaliacao[] = JSON.parse(raw);
+    return todas.filter((a) => a.produtoId === produtoId);
+  } catch {
+    return [];
+  }
+}
+
+function salvarAvaliacao(avaliacao: Avaliacao) {
+  const raw = localStorage.getItem(REVIEWS_KEY);
+  const todas: Avaliacao[] = raw ? JSON.parse(raw) : [];
+  todas.push(avaliacao);
+  localStorage.setItem(REVIEWS_KEY, JSON.stringify(todas));
+}
 
 export const Route = createFileRoute("/produto/$id")({
   head: () => ({
@@ -24,6 +54,11 @@ function ProdutoPage() {
   const [produto, setProduto] = useState<Product | null>(null);
   const [relacionados, setRelacionados] = useState<Product[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [estrelasSelecionadas, setEstrelasSelecionadas] = useState(5);
+  const [nomeAvaliador, setNomeAvaliador] = useState("");
+  const [comentario, setComentario] = useState("");
+  const [enviado, setEnviado] = useState(false);
 
   useEffect(() => {
     async function carregar() {
@@ -42,10 +77,32 @@ function ProdutoPage() {
           .limit(4);
         setRelacionados(todos || []);
       }
+      setAvaliacoes(carregarAvaliacoes(id));
       setCarregando(false);
     }
     carregar();
   }, [id]);
+
+  function enviarAvaliacao() {
+    if (!nomeAvaliador.trim() || !comentario.trim()) return;
+
+    const novaAvaliacao: Avaliacao = {
+      id: crypto.randomUUID(),
+      produtoId: id,
+      nome: nomeAvaliador.trim(),
+      estrelas: estrelasSelecionadas,
+      comentario: comentario.trim(),
+      data: new Date().toLocaleDateString("pt-BR"),
+    };
+
+    salvarAvaliacao(novaAvaliacao);
+    setAvaliacoes((prev) => [...prev, novaAvaliacao]);
+    setNomeAvaliador("");
+    setComentario("");
+    setEstrelasSelecionadas(5);
+    setEnviado(true);
+    setTimeout(() => setEnviado(false), 3000);
+  }
 
   if (carregando) {
     return (
@@ -163,6 +220,109 @@ function ProdutoPage() {
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
             {produto.descricao}
           </p>
+        </section>
+
+        <section className="mt-8 rounded-lg border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold text-foreground">
+            Avaliações dos clientes ({avaliacoes.length})
+          </h2>
+
+          <div className="mt-6 rounded-lg bg-background p-4">
+            <h3 className="text-sm font-medium text-foreground">Deixe sua avaliação</h3>
+
+            <div className="mt-3 flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((estrela) => (
+                <button
+                  key={estrela}
+                  type="button"
+                  onClick={() => setEstrelasSelecionadas(estrela)}
+                  className="transition-transform hover:scale-110"
+                >
+                  <Star
+                    className={`h-6 w-6 ${
+                      estrela <= estrelasSelecionadas
+                        ? "fill-gold text-gold"
+                        : "text-muted-foreground"
+                    }`}
+                  />
+                </button>
+              ))}
+              <span className="ml-2 text-sm text-muted-foreground">
+                {estrelasSelecionadas} {estrelasSelecionadas === 1 ? "estrela" : "estrelas"}
+              </span>
+            </div>
+
+            <input
+              type="text"
+              value={nomeAvaliador}
+              onChange={(e) => setNomeAvaliador(e.target.value)}
+              placeholder="Seu nome"
+              className="mt-3 w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none"
+            />
+
+            <textarea
+              value={comentario}
+              onChange={(e) => setComentario(e.target.value)}
+              placeholder="Escreva seu comentário sobre o produto..."
+              rows={3}
+              className="mt-2 w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none resize-none"
+            />
+
+            <button
+              onClick={enviarAvaliacao}
+              disabled={!nomeAvaliador.trim() || !comentario.trim()}
+              className="mt-3 inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-gold transition-colors hover:bg-brand-soft disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send className="h-4 w-4" />
+              Enviar avaliação
+            </button>
+
+            {enviado && (
+              <p className="mt-2 text-sm text-success">Avaliação enviada com sucesso!</p>
+            )}
+          </div>
+
+          {avaliacoes.length > 0 && (
+            <div className="mt-6 space-y-4">
+              {avaliacoes.map((avaliacao) => (
+                <div
+                  key={avaliacao.id}
+                  className="rounded-lg border border-border p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-medium text-gold">
+                        {avaliacao.nome.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{avaliacao.nome}</p>
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((e) => (
+                            <Star
+                              key={e}
+                              className={`h-3.5 w-3.5 ${
+                                e <= avaliacao.estrelas
+                                  ? "fill-gold text-gold"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{avaliacao.data}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">{avaliacao.comentario}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {avaliacoes.length === 0 && (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Nenhuma avaliação ainda. Seja o primeiro a avaliar!
+            </p>
+          )}
         </section>
 
         <section className="mt-10">
