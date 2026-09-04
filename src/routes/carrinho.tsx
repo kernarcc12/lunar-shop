@@ -1,18 +1,35 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Trash2, ShoppingBag } from "lucide-react";
+import { Trash2, ShoppingBag, MessageCircle } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { brl, getProduto } from "@/data/products";
 import { clearCart, removeFromCart, setQty, useCart } from "@/lib/cart";
 
+const WHATSAPP_NUMBER = "5587996233203";
+
+function buildCartWhatsAppLink(items: { produto: { nome: string; preco: number }; qtd: number }[]) {
+  const lines = items.map(
+    (i) => `• ${i.produto.nome} (x${i.qtd}) - ${brl(i.produto.preco * i.qtd)}`,
+  );
+  const total = items.reduce((s, i) => s + i.produto.preco * i.qtd, 0);
+  const message = `Olá! Vim pelo site e quero fazer um pedido:\n\n${lines.join("\n")}\n\n*Total: ${brl(total)}*\n\nAguardo confirmação!`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
 export const Route = createFileRoute("/carrinho")({
   head: () => ({
     meta: [
       { title: "Carrinho de compras | Lunar Produtos" },
-      { name: "description", content: "Revise os itens do seu carrinho e finalize a compra na Lunar Produtos." },
+      {
+        name: "description",
+        content: "Revise os itens do seu carrinho e finalize a compra na Lunar Produtos.",
+      },
       { property: "og:title", content: "Carrinho | Lunar Produtos" },
-      { property: "og:description", content: "Finalize sua compra com pagamento seguro e entrega rápida." },
+      {
+        property: "og:description",
+        content: "Finalize sua compra com pagamento seguro e entrega rápida.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -36,10 +53,10 @@ function Carrinho() {
 
         {pedidoFeito ? (
           <div className="rounded-lg border border-border bg-card p-10 text-center">
-            <p className="font-display text-2xl text-gold-deep">Pedido confirmado!</p>
+            <MessageCircle className="mx-auto h-12 w-12 text-green-500" />
+            <p className="mt-4 font-display text-2xl text-gold-deep">Pedido enviado!</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Em breve entraremos em contato pelo WhatsApp (87) 99623-3203 para combinar o
-              pagamento e a entrega.
+              Seu pedido foi enviado pelo WhatsApp. Aguarde a confirmação do vendedor.
             </p>
             <Link
               to="/"
@@ -130,17 +147,20 @@ function Carrinho() {
                 <span>Total</span>
                 <span>{brl(total)}</span>
               </div>
-              <p className="mt-1 text-sm text-success">
-                em 12x {brl(total / 12)} sem juros
-              </p>
+              <p className="mt-1 text-sm text-success">em 12x {brl(total / 12)} sem juros</p>
               <button
                 onClick={() => {
+                  const whatsappUrl = buildCartWhatsAppLink(
+                    linhas.map((l) => ({ produto: l.produto!, qtd: l.item.qtd })),
+                  );
+                  window.open(whatsappUrl, "_blank");
                   clearCart();
                   setPedidoFeito(true);
                 }}
-                className="mt-5 w-full rounded-md bg-brand py-3 font-medium text-gold hover:bg-brand-soft"
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-green-500 py-3 font-medium text-white hover:bg-green-600"
               >
-                Finalizar compra
+                <MessageCircle className="h-5 w-5" />
+                Finalizar compra pelo WhatsApp
               </button>
             </aside>
           </div>

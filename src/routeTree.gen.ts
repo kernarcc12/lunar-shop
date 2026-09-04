@@ -14,6 +14,7 @@ import { Route as CadastrarProdutoRouteImport } from './routes/cadastrar-produto
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as EditarProdutoIdRouteImport } from './routes/editar-produto.$id'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EditarProdutoIdRoute = EditarProdutoIdRouteImport.update({
+  id: '/editar-produto/$id',
+  path: '/editar-produto/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProdutoIdRoute = ProdutoIdRouteImport.update({
   id: '/produto/$id',
   path: '/produto/$id',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/editar-produto/$id': typeof EditarProdutoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/editar-produto/$id': typeof EditarProdutoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/editar-produto/$id': typeof EditarProdutoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/carrinho'
     | '/login'
+    | '/editar-produto/$id'
     | '/produto/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/carrinho'
     | '/login'
+    | '/editar-produto/$id'
     | '/produto/$id'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/carrinho'
     | '/login'
+    | '/editar-produto/$id'
     | '/produto/$id'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +117,7 @@ export interface RootRouteChildren {
   CadastroRoute: typeof CadastroRoute
   CarrinhoRoute: typeof CarrinhoRoute
   LoginRoute: typeof LoginRoute
+  EditarProdutoIdRoute: typeof EditarProdutoIdRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
 }
 
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/editar-produto/$id': {
+      id: '/editar-produto/$id'
+      path: '/editar-produto/$id'
+      fullPath: '/editar-produto/$id'
+      preLoaderRoute: typeof EditarProdutoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produto/$id': {
       id: '/produto/$id'
       path: '/produto/$id'
@@ -161,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   CadastroRoute: CadastroRoute,
   CarrinhoRoute: CarrinhoRoute,
   LoginRoute: LoginRoute,
+  EditarProdutoIdRoute: EditarProdutoIdRoute,
   ProdutoIdRoute: ProdutoIdRoute,
 }
 export const routeTree = rootRouteImport

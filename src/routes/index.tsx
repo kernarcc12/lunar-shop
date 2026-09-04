@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { ShieldCheck, Truck, CreditCard, Sparkles } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
-import { categorias, produtos } from "@/data/products";
+import { categorias, type Product } from "@/data/products";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,32 +27,44 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const [produtos, setProdutos] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function fetchProdutos() {
+      const { data } = await supabase
+        .from("produtos")
+        .select("*")
+        .order("criado_em", { ascending: false });
+      if (data) setProdutos(data);
+    }
+    fetchProdutos();
+  }, []);
+
   const ofertas = produtos.filter((p) => p.precoAntigo);
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      <section className="bg-brand">
+      <section className="bg-black">
         <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-10 md:grid-cols-2">
           <div>
             <p className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold">
-              <Sparkles className="h-4 w-4" /> Semana lunar
+              <Sparkles className="h-4 w-4" /> NOVIDADES LUNAR
             </p>
             <h1 className="mt-3 font-display text-3xl leading-tight text-brand-foreground md:text-5xl">
-              Até <span className="text-gold">40% OFF</span> em tecnologia e fragrâncias
+              Tecnologia e variedades para você
             </h1>
             <p className="mt-3 max-w-md text-sm text-brand-foreground/70">
-              Parcele em até 12x sem juros e receba em casa com frete grátis nos produtos
-              selecionados.
+              Produtos selecionados, novidades e ofertas especiais em um só lugar.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 text-sm text-brand-foreground/80">
             {[
-              { icon: Truck, t: "Frete grátis", d: "em produtos selecionados" },
-              { icon: CreditCard, t: "Até 12x", d: "sem juros no cartão" },
-              { icon: ShieldCheck, t: "Compra segura", d: "garantia de 12 meses" },
-              { icon: Sparkles, t: "Novidades", d: "toda semana na loja" },
+              { icon: Truck, t: "Enviamos para você", d: "Consulte as opções de entrega" },
+              { icon: CreditCard, t: "Facilidade no pagamento", d: "Escolha a melhor forma para você" },
+              { icon: ShieldCheck, t: "Produtos selecionados", d: "Qualidade e variedade em um só lugar" },
+              { icon: Sparkles, t: "Sempre tem novidade", d: "Acompanhe nossas novidades no Instagram" },
             ].map((b) => (
               <div key={b.t} className="rounded-lg border border-gold/20 bg-brand-soft p-4">
                 <b.icon className="h-5 w-5 text-gold" />

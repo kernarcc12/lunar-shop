@@ -1,4 +1,7 @@
-import { Instagram, Phone, ShieldCheck, CreditCard, Truck } from "lucide-react";
+import { Instagram, Phone, MessageCircle, ShieldCheck, CreditCard, Truck } from "lucide-react";
+
+const WHATSAPP_NUMBER = "5587996233203";
+const PHONE_NUMBER = "87996233203";
 
 export function Footer() {
   return (
@@ -13,12 +16,28 @@ export function Footer() {
         </div>
         <div className="space-y-2 text-sm text-brand-foreground/80">
           <p className="font-medium text-brand-foreground">Atendimento</p>
-          <p className="flex items-center gap-2">
-            <Phone className="h-4 w-4 text-gold" /> (87) 99623-3203
-          </p>
-          <p className="flex items-center gap-2">
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-gold transition-colors"
+          >
+            <MessageCircle className="h-4 w-4 text-gold" /> (87) 99623-3203
+          </a>
+          <a
+            href={`tel:+55${PHONE_NUMBER}`}
+            className="flex items-center gap-2 hover:text-gold transition-colors"
+          >
+            <Phone className="h-4 w-4 text-gold" /> Ligар
+          </a>
+          <a
+            href="https://www.instagram.com/luna.ressence"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-gold transition-colors"
+          >
             <Instagram className="h-4 w-4 text-gold" /> @luna.ressence
-          </p>
+          </a>
         </div>
         <div className="space-y-2 text-sm text-brand-foreground/80">
           <p className="font-medium text-brand-foreground">Compra garantida</p>

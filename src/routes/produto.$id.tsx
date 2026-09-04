@@ -3,6 +3,7 @@ import { Star, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
+import { WhatsAppButton } from "@/components/store/WhatsAppButton";
 import { brl, getProduto, produtos } from "@/data/products";
 import { addToCart } from "@/lib/cart";
 
@@ -15,7 +16,10 @@ export const Route = createFileRoute("/produto/$id")({
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Produto indisponível | Lunar Produtos" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Produto indisponível | Lunar Produtos" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const { produto } = loaderData;
@@ -102,6 +106,11 @@ function ProdutoPage() {
               >
                 Adicionar ao carrinho
               </button>
+              <WhatsAppButton
+                productName={produto.nome}
+                productPrice={produto.preco}
+                productUrl={`https://lunar-produtos.pages.dev/produto/${produto.id}`}
+              />
             </div>
 
             <ul className="mt-6 space-y-2 text-sm text-muted-foreground">

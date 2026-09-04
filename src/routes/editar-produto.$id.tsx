@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, PackagePlus, LogIn, Upload, X } from "lucide-react";
+import { ArrowLeft, Save, LogIn, Upload, X, Loader2, Trash2 } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { useAuth } from "@/lib/auth";
@@ -44,19 +44,22 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export const Route = createFileRoute("/cadastrar-produto")({
+export const Route = createFileRoute("/editar-produto/$id")({
   head: () => ({
-    meta: [{ title: "Cadastrar Produto | Lunar Produtos" }],
+    meta: [{ title: "Editar Produto | Lunar Produtos" }],
   }),
-  component: CadastrarProduto,
+  component: EditarProduto,
 });
 
-function CadastrarProduto() {
+function EditarProduto() {
+  const { id } = Route.useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [enviado, setEnviado] = useState(false);
+  const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
+  const [salvo, setSalvo] = useState(false);
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormData>({
@@ -73,6 +76,50 @@ function CadastrarProduto() {
       descricao: "",
     },
   });
+
+  useEffect(() => {
+    async function carregarProduto() {
+      const { data, error } = await supabase
+        .from("produtos")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error || !data) {
+        setErro("Produto não encontrado");
+        setCarregando(false);
+        return;
+      }
+
+      if (data.criado_por !== user?.id) {
+        setErro("Você não tem permissão para editar este produto");
+        setCarregando(false);
+        return;
+      }
+
+      form.reset({
+        nome: data.nome,
+        categoria: data.categoria,
+        preco: data.preco,
+        precoAntigo: data.preco_antigo || "",
+        imagem: data.imagem || "",
+        parcelas: data.parcelas,
+        freteGratis: data.frete_gratis,
+        avaliacao: data.avaliacao,
+        descricao: data.descricao,
+      });
+
+      if (data.imagem) {
+        setImagemPreview(data.imagem);
+      }
+
+      setCarregando(false);
+    }
+
+    if (user) {
+      carregarProduto();
+    }
+  }, [id, user, form]);
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -100,30 +147,49 @@ function CadastrarProduto() {
     }
   }
 
+  async function excluirProduto() {
+    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
+    
+    setExcluindo(true);
+    const { error } = await supabase
+      .from("produtos")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      setErro(error.message);
+      setExcluindo(false);
+      return;
+    }
+
+    navigate({ to: "/" });
+  }
+
   async function onSubmit(data: FormData) {
     if (!user) return;
     setErro("");
 
-    const { error } = await supabase.from("produtos").insert({
-      nome: data.nome,
-      categoria: data.categoria,
-      preco: data.preco,
-      preco_antigo: data.precoAntigo && data.precoAntigo > 0 ? data.precoAntigo : null,
-      imagem: data.imagem || "",
-      parcelas: data.parcelas,
-      frete_gratis: data.freteGratis,
-      avaliacao: data.avaliacao,
-      vendidos: 0,
-      descricao: data.descricao,
-      criado_por: user.id,
-    });
+    const { error } = await supabase
+      .from("produtos")
+      .update({
+        nome: data.nome,
+        categoria: data.categoria,
+        preco: data.preco,
+        preco_antigo: data.precoAntigo && data.precoAntigo > 0 ? data.precoAntigo : null,
+        imagem: data.imagem || "",
+        parcelas: data.parcelas,
+        frete_gratis: data.freteGratis,
+        avaliacao: data.avaliacao,
+        descricao: data.descricao,
+      })
+      .eq("id", id);
 
     if (error) {
       setErro(error.message);
       return;
     }
 
-    setEnviado(true);
+    setSalvo(true);
   }
 
   if (!user) {
@@ -134,7 +200,7 @@ function CadastrarProduto() {
           <div className="rounded-lg border border-border bg-card p-10">
             <h1 className="text-xl font-semibold text-foreground">Acesso restrito</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Faça login para cadastrar produtos.
+              Faça login para editar produtos.
             </p>
             <Link
               to="/login"
@@ -150,20 +216,54 @@ function CadastrarProduto() {
     );
   }
 
-  if (enviado) {
+  if (carregando) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-md px-4 py-16 text-center">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-gold" />
+          <p className="mt-4 text-sm text-muted-foreground">Carregando produto...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (erro) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-md px-4 py-16 text-center">
+          <div className="rounded-lg border border-border bg-card p-10">
+            <h1 className="text-xl font-semibold text-foreground">Erro</h1>
+            <p className="mt-2 text-sm text-muted-foreground">{erro}</p>
+            <Link
+              to="/"
+              className="mt-6 inline-flex items-center justify-center rounded-md bg-brand px-6 py-2.5 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
+            >
+              Voltar à loja
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (salvo) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="mx-auto max-w-2xl px-4 py-16 text-center">
           <div className="rounded-lg border border-border bg-card p-10">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
-              <PackagePlus className="h-8 w-8 text-success" />
+              <Save className="h-8 w-8 text-success" />
             </div>
             <h1 className="mt-6 text-2xl font-semibold text-foreground">
-              Produto cadastrado com sucesso!
+              Produto atualizado com sucesso!
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              O produto foi salvo no banco de dados e já está disponível na loja.
+              As alterações foram salvas no banco de dados.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
@@ -174,12 +274,12 @@ function CadastrarProduto() {
               </Link>
               <button
                 onClick={() => {
-                  setEnviado(false);
-                  form.reset();
+                  setSalvo(false);
+                  navigate({ to: "/" });
                 }}
                 className="inline-flex items-center justify-center rounded-md border border-border bg-background px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
               >
-                Cadastrar outro
+                Voltar
               </button>
             </div>
           </div>
@@ -203,9 +303,9 @@ function CadastrarProduto() {
 
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border px-6 py-4">
-            <h1 className="text-xl font-semibold text-foreground">Cadastrar Produto</h1>
+            <h1 className="text-xl font-semibold text-foreground">Editar Produto</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Preencha os dados do produto para adicioná-lo à loja.
+              Atualize os dados do produto.
             </p>
           </div>
 
@@ -238,7 +338,7 @@ function CadastrarProduto() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Categoria</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione" />
@@ -411,20 +511,32 @@ function CadastrarProduto() {
                 )}
               />
 
-              <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
-                <Link
-                  to="/"
-                  className="inline-flex items-center justify-center rounded-md border border-border bg-background px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-                >
-                  Cancelar
-                </Link>
+              <div className="flex items-center justify-between border-t border-border pt-6">
                 <Button
-                  type="submit"
-                  className="bg-brand text-gold hover:bg-brand-soft"
+                  type="button"
+                  variant="destructive"
+                  onClick={excluirProduto}
+                  disabled={excluindo}
+                  className="gap-2"
                 >
-                  <PackagePlus className="mr-2 h-4 w-4" />
-                  Cadastrar produto
+                  <Trash2 className="h-4 w-4" />
+                  {excluindo ? "Excluindo..." : "Excluir produto"}
                 </Button>
+                <div className="flex items-center gap-3">
+                  <Link
+                    to="/"
+                    className="inline-flex items-center justify-center rounded-md border border-border bg-background px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                  >
+                    Cancelar
+                  </Link>
+                  <Button
+                    type="submit"
+                    className="bg-brand text-gold hover:bg-brand-soft"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    Salvar alterações
+                  </Button>
+                </div>
               </div>
             </form>
           </Form>
