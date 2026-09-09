@@ -54,7 +54,7 @@ export const Route = createFileRoute("/editar-produto/$id")({
 function EditarProduto() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [salvo, setSalvo] = useState(false);
@@ -91,7 +91,7 @@ function EditarProduto() {
         return;
       }
 
-      if (data.criado_por !== user?.id) {
+      if (data.criado_por !== user?.id && !isAdmin) {
         setErro("Você não tem permissão para editar este produto");
         setCarregando(false);
         return;
@@ -119,7 +119,7 @@ function EditarProduto() {
     if (user) {
       carregarProduto();
     }
-  }, [id, user, form]);
+  }, [id, user, isAdmin, form]);
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

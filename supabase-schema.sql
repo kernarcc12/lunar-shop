@@ -38,10 +38,20 @@ CREATE POLICY "Usuários podem editar seus próprios produtos"
   ON produtos FOR UPDATE
   USING (auth.uid() = criado_por);
 
+-- 5b. Política: admins podem editar qualquer produto
+CREATE POLICY "Admins podem editar qualquer produto"
+  ON produtos FOR UPDATE
+  USING (auth.jwt() -> 'app_metadata' ->> 'role' = 'admin');
+
 -- 6. Política: apenas o criador pode deletar seu produto
 CREATE POLICY "Usuários podem deletar seus próprios produtos"
   ON produtos FOR DELETE
   USING (auth.uid() = criado_por);
+
+-- 6b. Política: admins podem deletar qualquer produto
+CREATE POLICY "Admins podem deletar qualquer produto"
+  ON produtos FOR DELETE
+  USING (auth.jwt() -> 'app_metadata' ->> 'role' = 'admin');
 
 -- 7. Índices para performance
 CREATE INDEX IF NOT EXISTS idx_produtos_categoria ON produtos(categoria);
