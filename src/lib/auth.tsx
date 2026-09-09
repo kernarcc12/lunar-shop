@@ -49,7 +49,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_OUT" || event === "TOKEN_REFRESHED" && !session) {
+      if (event === "SIGNED_OUT") {
+        setSession(null);
+        setUser(null);
+        setIsAdmin(false);
+        return;
+      }
+      if (event === "TOKEN_REFRESHED" && !session) {
         await supabase.auth.signOut();
         setSession(null);
         setUser(null);
@@ -99,6 +105,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
+    setSession(null);
+    setUser(null);
+    setIsAdmin(false);
     await supabase.auth.signOut();
   }
 
