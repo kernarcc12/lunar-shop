@@ -57,20 +57,14 @@ export function Slideshow() {
     <div className="relative w-full overflow-hidden">
       <div
         className="relative flex min-h-[260px] items-center md:min-h-[380px]"
-        style={{ backgroundColor: slide.cor_fundo, color: slide.cor_texto }}
+        style={{ color: slide.cor_texto }}
       >
         {slide.imagem && (
           <div className="absolute inset-0">
             <img
               src={slide.imagem}
               alt={slide.titulo}
-              className="h-full w-full object-cover"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(to right, ${slide.cor_fundo}ee 0%, ${slide.cor_fundo}88 50%, transparent 100%)`,
-              }}
+              className="h-full w-full object-contain"
             />
           </div>
         )}
