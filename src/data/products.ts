@@ -16,7 +16,6 @@ export const categorias = [
   "Tecnologia",
   "Artesanato",
   "Caça & Pesca",
-  "Fragancias",
   "Cosméticos",
   "Acessórios",
 ] as const;
