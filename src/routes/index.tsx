@@ -47,7 +47,7 @@ function Home() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <section className="bg-black">
+      <section className="bg-brand">
         <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-10 md:grid-cols-2">
           <div>
             <p className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold">

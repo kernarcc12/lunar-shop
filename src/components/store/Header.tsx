@@ -12,7 +12,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="bg-black text-brand-foreground">
+      <div className="bg-brand text-brand-foreground">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3">
           <Link to="/" className="flex items-center gap-2">
             <img
