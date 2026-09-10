@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingCart, MapPin, Menu, PackagePlus, LogIn, LogOut, User } from "lucide-react";
+import { Search, ShoppingCart, MapPin, Menu, PackagePlus, LogIn, LogOut, User, LayoutPanelLeft } from "lucide-react";
 import logo from "@/assets/icone.png";
 import { categorias } from "@/data/products";
 import { useCart } from "@/lib/cart";
@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 export function Header() {
   const items = useCart();
   const total = items.reduce((s, i) => s + i.qtd, 0);
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
 
   return (
     <header className="sticky top-0 z-40">
@@ -115,6 +115,14 @@ export function Header() {
               className="ml-auto flex shrink-0 items-center gap-1 font-medium text-gold-deep hover:text-gold"
             >
               <PackagePlus className="h-4 w-4" /> Cadastrar produto
+            </Link>
+          )}
+          {isAdmin && (
+            <Link
+              to="/admin/slides"
+              className="flex shrink-0 items-center gap-1 font-medium text-gold-deep hover:text-gold"
+            >
+              <LayoutPanelLeft className="h-4 w-4" /> Gerenciar slides
             </Link>
           )}
         </div>

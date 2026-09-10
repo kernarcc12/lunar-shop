@@ -4,6 +4,7 @@ import { ShieldCheck, Truck, CreditCard, Sparkles } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
+import { Slideshow } from "@/components/store/Slideshow";
 import { categorias, type Product } from "@/data/products";
 import { supabase } from "@/lib/supabase";
 
@@ -46,6 +47,8 @@ function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+
+      <Slideshow />
 
       <section className="bg-brand">
         <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-10 md:grid-cols-2">

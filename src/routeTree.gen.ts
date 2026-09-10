@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminSlidesRouteImport } from './routes/admin.slides'
 import { Route as CadastrarProdutoRouteImport } from './routes/cadastrar-produto'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
@@ -21,6 +22,11 @@ import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSlidesRoute = AdminSlidesRouteImport.update({
+  id: '/admin/slides',
+  path: '/admin/slides',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CadastrarProdutoRoute = CadastrarProdutoRouteImport.update({
@@ -61,6 +67,7 @@ const ProdutoIdRoute = ProdutoIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin/slides': typeof AdminSlidesRoute
   '/cadastrar-produto': typeof CadastrarProdutoRoute
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/slides': typeof AdminSlidesRoute
   '/cadastrar-produto': typeof CadastrarProdutoRoute
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin/slides': typeof AdminSlidesRoute
   '/cadastrar-produto': typeof CadastrarProdutoRoute
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin/slides'
     | '/cadastrar-produto'
     | '/cadastro'
     | '/carrinho'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/slides'
     | '/cadastrar-produto'
     | '/cadastro'
     | '/carrinho'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin/slides'
     | '/cadastrar-produto'
     | '/cadastro'
     | '/carrinho'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminSlidesRoute: typeof AdminSlidesRoute
   CadastrarProdutoRoute: typeof CadastrarProdutoRoute
   CadastroRoute: typeof CadastroRoute
   CarrinhoRoute: typeof CarrinhoRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/slides': {
+      id: '/admin/slides'
+      path: '/admin/slides'
+      fullPath: '/admin/slides'
+      preLoaderRoute: typeof AdminSlidesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cadastrar-produto': {
@@ -197,6 +217,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminSlidesRoute: AdminSlidesRoute,
   CadastrarProdutoRoute: CadastrarProdutoRoute,
   CadastroRoute: CadastroRoute,
   CarrinhoRoute: CarrinhoRoute,
