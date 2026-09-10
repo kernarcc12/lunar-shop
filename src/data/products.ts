@@ -14,8 +14,8 @@ export type Product = {
 
 export const categorias = [
   "Tecnologia",
+  "Caça & Pesca",
   "Fragrâncias",
-  "Casa & Aromas",
   "Acessórios",
 ] as const;
 
