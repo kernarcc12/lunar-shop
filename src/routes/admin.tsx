@@ -27,6 +27,7 @@ import {
   Users,
   ShoppingBag,
   BarChart3,
+  User,
 } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
@@ -217,38 +218,40 @@ function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b border-border bg-brand text-brand-foreground">
-        <div className="flex h-14 items-center px-4">
+    <div className="min-h-screen bg-gray-50">
+      <header className="sticky top-0 z-50 border-b border-navy-light bg-navy-deep text-white shadow-lg">
+        <div className="flex h-16 items-center px-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="mr-3 rounded p-1.5 hover:bg-brand-soft lg:hidden"
+            className="mr-3 rounded-lg p-2 hover:bg-navy lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-display text-lg font-semibold tracking-[0.15em] text-gold">
-              LUNAR
-            </span>
-            <span className="hidden text-xs tracking-widest text-brand-foreground/60 sm:inline">
-              ADMIN
-            </span>
+          <Link to="/" className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold">
+              <span className="text-xl font-bold text-navy-deep">L</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold tracking-wider text-white">LUNAR</span>
+              <span className="text-[10px] tracking-widest text-gold/80">ADMIN</span>
+            </div>
           </Link>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-4">
             <Link
               to="/"
-              className="flex items-center gap-1.5 rounded px-2 py-1.5 text-xs text-brand-foreground/70 hover:bg-brand-soft hover:text-gold"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-navy hover:text-gold"
             >
-              <ChevronLeft className="h-3.5 w-3.5" />
+              <ChevronLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Ver loja</span>
             </Link>
-            <span className="text-xs text-brand-foreground/50">{user.email}</span>
+            <div className="hidden h-6 w-px bg-white/20 sm:block" />
+            <span className="hidden text-sm text-white/60 sm:inline">{user.email}</span>
             <button
               onClick={handleSignOut}
-              className="rounded p-1.5 text-brand-foreground/70 hover:bg-brand-soft hover:text-gold"
+              className="rounded-lg p-2 text-white/70 transition-colors hover:bg-navy hover:text-gold"
               title="Sair"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -263,11 +266,11 @@ function AdminPage() {
         )}
 
         <aside
-          className={`fixed top-14 bottom-0 z-40 w-64 border-r border-border bg-card transition-transform lg:sticky lg:translate-x-0 ${
+          className={`fixed top-16 bottom-0 z-40 w-64 border-r border-navy-light bg-navy-deep transition-transform lg:sticky lg:translate-x-0 ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          <nav className="flex flex-col gap-1 p-3">
+          <nav className="flex flex-col gap-2 p-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = section === item.id;
@@ -278,10 +281,10 @@ function AdminPage() {
                     setSection(item.id);
                     setSidebarOpen(false);
                   }}
-                  className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                     active
-                      ? "bg-brand text-gold"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                      ? "bg-gold text-navy-deep shadow-md"
+                      : "text-white/70 hover:bg-navy hover:text-white"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -291,10 +294,17 @@ function AdminPage() {
             })}
           </nav>
 
-          <div className="absolute bottom-0 left-0 right-0 border-t border-border p-3">
-            <div className="rounded-lg bg-accent/50 p-3">
-              <p className="text-xs font-medium text-foreground">{user.email}</p>
-              <p className="text-xs text-muted-foreground">Administrador</p>
+          <div className="absolute bottom-0 left-0 right-0 border-t border-navy-light p-4">
+            <div className="rounded-xl bg-navy p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/20">
+                  <User className="h-5 w-5 text-gold" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-white">{user.email}</p>
+                  <p className="text-xs text-gold/80">Administrador</p>
+                </div>
+              </div>
             </div>
           </div>
         </aside>
@@ -334,42 +344,139 @@ function DashboardSection() {
       label: "Produtos",
       value: stats.produtos,
       icon: ShoppingBag,
-      color: "bg-blue-500/10 text-blue-600",
+      color: "bg-navy text-gold",
+      bgLight: "bg-navy/10",
     },
     {
       label: "Slides",
       value: stats.slides,
       icon: LayoutPanelLeft,
-      color: "bg-purple-500/10 text-purple-600",
+      color: "bg-gold text-navy-deep",
+      bgLight: "bg-gold/10",
     },
     {
       label: "Flyers",
       value: stats.flyers,
       icon: Image,
-      color: "bg-amber-500/10 text-amber-600",
+      color: "bg-navy-deep text-gold",
+      bgLight: "bg-navy-deep/10",
     },
   ];
 
   return (
     <div>
-      <h2 className="mb-6 text-2xl font-semibold text-foreground">Dashboard</h2>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-navy-deep">Dashboard</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Visao geral da loja</p>
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-3">
         {cards.map((c) => {
           const Icon = c.icon;
           return (
-            <div key={c.label} className="rounded-xl border border-border bg-card p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{c.label}</p>
-                  <p className="mt-1 text-3xl font-bold text-foreground">{c.value}</p>
-                </div>
-                <div className={`rounded-xl p-3 ${c.color}`}>
-                  <Icon className="h-6 w-6" />
+            <div
+              key={c.label}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-white p-6 shadow-sm transition-all hover:shadow-md"
+            >
+              <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-navy/5 transition-transform group-hover:scale-150" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{c.label}</p>
+                    <p className="mt-2 text-4xl font-bold text-navy-deep">{c.value}</p>
+                  </div>
+                  <div className={`rounded-2xl p-4 ${c.color}`}>
+                    <Icon className="h-7 w-7" />
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
+      </div>
+
+      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+        <div className="rounded-2xl border border-border bg-white p-6">
+          <h3 className="text-lg font-semibold text-navy-deep">Acoes Rapidas</h3>
+          <div className="mt-4 space-y-3">
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent("admin-navigate", { detail: "produtos" }));
+              }}
+              className="flex items-center gap-3 rounded-xl border border-border p-4 transition-colors hover:border-gold hover:bg-gold/5"
+            >
+              <div className="rounded-xl bg-navy/10 p-3">
+                <ShoppingBag className="h-5 w-5 text-navy" />
+              </div>
+              <div>
+                <p className="font-medium text-navy-deep">Gerenciar Produtos</p>
+                <p className="text-xs text-muted-foreground">
+                  Adicionar, editar ou remover produtos
+                </p>
+              </div>
+            </a>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent("admin-navigate", { detail: "slides" }));
+              }}
+              className="flex items-center gap-3 rounded-xl border border-border p-4 transition-colors hover:border-gold hover:bg-gold/5"
+            >
+              <div className="rounded-xl bg-gold/10 p-3">
+                <LayoutPanelLeft className="h-5 w-5 text-gold-deep" />
+              </div>
+              <div>
+                <p className="font-medium text-navy-deep">Gerenciar Slides</p>
+                <p className="text-xs text-muted-foreground">Configurar o slideshow da home</p>
+              </div>
+            </a>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent("admin-navigate", { detail: "flyers" }));
+              }}
+              className="flex items-center gap-3 rounded-xl border border-border p-4 transition-colors hover:border-gold hover:bg-gold/5"
+            >
+              <div className="rounded-xl bg-navy-deep/10 p-3">
+                <Image className="h-5 w-5 text-navy-deep" />
+              </div>
+              <div>
+                <p className="font-medium text-navy-deep">Gerenciar Flyers</p>
+                <p className="text-xs text-muted-foreground">
+                  Criar e gerenciar flyers promocionais
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-white p-6">
+          <h3 className="text-lg font-semibold text-navy-deep">Resumo</h3>
+          <div className="mt-4 space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <span className="text-sm text-muted-foreground">Total de itens</span>
+              <span className="font-semibold text-navy-deep">
+                {stats.produtos + stats.slides + stats.flyers}
+              </span>
+            </div>
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <span className="text-sm text-muted-foreground">Produtos ativos</span>
+              <span className="font-semibold text-navy-deep">{stats.produtos}</span>
+            </div>
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <span className="text-sm text-muted-foreground">Slides configurados</span>
+              <span className="font-semibold text-navy-deep">{stats.slides}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Flyers publicados</span>
+              <span className="font-semibold text-navy-deep">{stats.flyers}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -566,7 +673,7 @@ function ProdutosSection() {
           <h2 className="text-2xl font-semibold text-foreground">Produtos</h2>
           <p className="mt-1 text-sm text-muted-foreground">Gerencie os produtos da loja.</p>
         </div>
-        <Button onClick={openNewForm} className="bg-brand text-gold hover:bg-brand-soft">
+        <Button onClick={openNewForm} className="bg-navy text-gold hover:bg-navy-deep">
           <Plus className="mr-2 h-4 w-4" />
           Novo produto
         </Button>
@@ -781,7 +888,7 @@ function ProdutosSection() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" className="bg-brand text-gold hover:bg-brand-soft">
+                <Button type="submit" className="bg-navy text-gold hover:bg-navy-deep">
                   <Save className="mr-2 h-4 w-4" />
                   {editingProduto ? "Salvar" : "Criar produto"}
                 </Button>
@@ -1069,7 +1176,7 @@ function SlidesSection() {
             Configure os slides do slideshow da página inicial.
           </p>
         </div>
-        <Button onClick={openNewForm} className="bg-brand text-gold hover:bg-brand-soft">
+        <Button onClick={openNewForm} className="bg-navy text-gold hover:bg-navy-deep">
           <Plus className="mr-2 h-4 w-4" />
           Novo slide
         </Button>
@@ -1300,7 +1407,7 @@ function SlidesSection() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" className="bg-brand text-gold hover:bg-brand-soft">
+                <Button type="submit" className="bg-navy text-gold hover:bg-navy-deep">
                   <Save className="mr-2 h-4 w-4" />
                   {editingSlide ? "Salvar" : "Criar slide"}
                 </Button>
@@ -1626,7 +1733,7 @@ function FlyersSection() {
             Cadastre flyers estáticos e animados para a página de ofertas.
           </p>
         </div>
-        <Button onClick={openNewForm} className="bg-brand text-gold hover:bg-brand-soft">
+        <Button onClick={openNewForm} className="bg-navy text-gold hover:bg-navy-deep">
           <Plus className="mr-2 h-4 w-4" />
           Novo flyer
         </Button>
@@ -1839,7 +1946,7 @@ function FlyersSection() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" className="bg-brand text-gold hover:bg-brand-soft">
+                <Button type="submit" className="bg-navy text-gold hover:bg-navy-deep">
                   <Save className="mr-2 h-4 w-4" />
                   {editingFlyer ? "Salvar" : "Criar flyer"}
                 </Button>

@@ -50,7 +50,7 @@ export function Header() {
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3">
           {/* Logo */}
           <Link to="/" className="flex shrink-0 items-center gap-2">
-            <img src={logo} alt="Lunar Produtos" className="h-10 w-10 rounded-full" />
+            <img src={logo} alt="Lunar Produtos" className="h-10 w-10 rounded-full object-cover" />
             <span className="text-xl font-bold tracking-tight text-white">
               Lunar<span className="text-gold">Produtos</span>
             </span>
