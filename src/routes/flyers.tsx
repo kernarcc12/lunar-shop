@@ -123,7 +123,7 @@ function FlyersPage() {
                       <p className="mt-0.5 text-sm text-muted-foreground">Ofertas com mais vida</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
+                  <div className="flex flex-wrap justify-center gap-5 sm:justify-start">
                     {flyersAnimados.map((flyer, i) => (
                       <FlyerCard key={flyer.id} flyer={flyer} index={i} />
                     ))}
@@ -142,7 +142,7 @@ function FlyersPage() {
                       <p className="mt-0.5 text-sm text-muted-foreground">Ofertas estáticas</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
+                  <div className="flex flex-wrap justify-center gap-5 sm:justify-start">
                     {flyersEstaticos.map((flyer, i) => (
                       <FlyerCard key={flyer.id} flyer={flyer} index={i} />
                     ))}
@@ -164,10 +164,10 @@ function FlyerCard({ flyer, index }: { flyer: Flyer; index: number }) {
 
   const content = (
     <div
-      className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-xl hover:shadow-gold/5"
+      className="group relative w-[230px] overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-xl hover:shadow-gold/5"
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      <div className="relative aspect-[9/16] overflow-hidden bg-muted">
+      <div className="relative h-[427px] w-[230px] overflow-hidden bg-muted">
         <img
           src={flyer.imagem}
           alt={flyer.titulo || "Flyer"}
@@ -178,9 +178,18 @@ function FlyerCard({ flyer, index }: { flyer: Flyer; index: number }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
         {flyer.tipo === "animado" && (
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-purple-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg shadow-purple-600/30">
-            <Film className="h-3 w-3" />
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded-full bg-purple-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-lg shadow-purple-600/30">
+            <Film className="h-2.5 w-2.5" />
             Animado
+          </div>
+        )}
+
+        {hasLink && (
+          <div className="absolute inset-x-0 bottom-0 z-10 p-3 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+            <div className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+              <ExternalLink className="h-2.5 w-2.5" />
+              Ver oferta
+            </div>
           </div>
         )}
 
@@ -195,14 +204,14 @@ function FlyerCard({ flyer, index }: { flyer: Flyer; index: number }) {
       </div>
 
       {(flyer.titulo || flyer.descricao) && (
-        <div className="p-4">
+        <div className="p-3">
           {flyer.titulo && (
-            <h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-1 sm:text-base">
+            <h3 className="text-xs font-semibold leading-snug text-foreground line-clamp-1 sm:text-sm">
               {flyer.titulo}
             </h3>
           )}
           {flyer.descricao && (
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground line-clamp-2 sm:text-sm">
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground line-clamp-2">
               {flyer.descricao}
             </p>
           )}
