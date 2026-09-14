@@ -30,7 +30,6 @@ export const Route = createFileRoute("/flyers")({
 function FlyersPage() {
   const [flyers, setFlyers] = useState<Flyer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedFlyer, setSelectedFlyer] = useState<Flyer | null>(null);
 
   useEffect(() => {
     fetchFlyers();
@@ -114,11 +113,7 @@ function FlyersPage() {
                 </div>
                 <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                   {flyersAnimados.map((flyer) => (
-                    <FlyerCard
-                      key={flyer.id}
-                      flyer={flyer}
-                      onClick={() => setSelectedFlyer(flyer)}
-                    />
+                    <FlyerCard key={flyer.id} flyer={flyer} />
                   ))}
                 </div>
               </section>
@@ -137,11 +132,7 @@ function FlyersPage() {
                 </div>
                 <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                   {flyersEstaticos.map((flyer) => (
-                    <FlyerCard
-                      key={flyer.id}
-                      flyer={flyer}
-                      onClick={() => setSelectedFlyer(flyer)}
-                    />
+                    <FlyerCard key={flyer.id} flyer={flyer} />
                   ))}
                 </div>
               </section>
@@ -150,80 +141,16 @@ function FlyersPage() {
         )}
       </main>
 
-      {selectedFlyer && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
-          onClick={() => setSelectedFlyer(null)}
-        >
-          <div
-            className="relative w-full max-w-sm rounded-2xl bg-card shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setSelectedFlyer(null)}
-              className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white text-sm transition-colors hover:bg-black/70"
-            >
-              ✕
-            </button>
-            <img
-              src={selectedFlyer.imagem}
-              alt={selectedFlyer.titulo || "Flyer"}
-              className="w-full object-contain"
-            />
-            {(selectedFlyer.titulo || selectedFlyer.descricao) && (
-              <div className="p-4">
-                {selectedFlyer.titulo && (
-                  <h3 className="text-lg font-semibold text-foreground">
-                    {selectedFlyer.titulo}
-                  </h3>
-                )}
-                {selectedFlyer.descricao && (
-                  <p className="mt-1 text-sm text-muted-foreground">{selectedFlyer.descricao}</p>
-                )}
-                {selectedFlyer.link && (
-                  selectedFlyer.link.startsWith("http") ? (
-                    <a
-                      href={selectedFlyer.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Ver oferta
-                    </a>
-                  ) : (
-                    <Link
-                      to={selectedFlyer.link}
-                      className="mt-3 inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Ver oferta
-                    </Link>
-                  )
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       <Footer />
     </div>
   );
 }
 
-function FlyerCard({
-  flyer,
-  onClick,
-}: {
-  flyer: Flyer;
-  onClick: () => void;
-}) {
-  return (
-    <div
-      className="group relative cursor-pointer overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-gold/50 hover:shadow-lg hover:shadow-gold/5"
-      onClick={onClick}
-    >
+function FlyerCard({ flyer }: { flyer: Flyer }) {
+  const hasLink = !!flyer.link;
+
+  const content = (
+    <div className="group relative overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-gold/50 hover:shadow-lg hover:shadow-gold/5">
       <div className="relative aspect-[9/16] overflow-hidden">
         <img
           src={flyer.imagem}
@@ -236,10 +163,17 @@ function FlyerCard({
             Animado
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <p className="text-sm font-medium">Clique para ampliar</p>
-        </div>
+        {hasLink && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        )}
+        {hasLink && (
+          <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="flex items-center gap-1 text-sm font-medium">
+              <ExternalLink className="h-3.5 w-3.5" />
+              Ver oferta
+            </div>
+          </div>
+        )}
       </div>
       {(flyer.titulo || flyer.descricao) && (
         <div className="p-4">
@@ -251,14 +185,24 @@ function FlyerCard({
               {flyer.descricao}
             </p>
           )}
-          {flyer.link && (
-            <div className="mt-3 flex items-center gap-1 text-sm font-medium text-gold-deep">
-              <ExternalLink className="h-3.5 w-3.5" />
-              Ver oferta
-            </div>
-          )}
         </div>
       )}
     </div>
+  );
+
+  if (!hasLink) return content;
+
+  if (flyer.link.startsWith("http")) {
+    return (
+      <a href={flyer.link} target="_blank" rel="noopener noreferrer" className="block">
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={flyer.link} className="block">
+      {content}
+    </Link>
   );
 }
