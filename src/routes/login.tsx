@@ -7,6 +7,7 @@ import { LogIn, MailCheck } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import {
   Form,
   FormControl,
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { signIn, resetPassword } = useAuth();
+  const { signIn, resetPassword, isAdmin } = useAuth();
   const [erro, setErro] = useState("");
   const [showReset, setShowReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
@@ -62,7 +63,15 @@ function LoginPage() {
       setErro(result.error);
       return;
     }
-    navigate({ to: "/" });
+    // Check if user is admin after login and redirect accordingly
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user?.app_metadata?.["role"] === "admin" || user?.user_metadata?.["role"] === "admin") {
+      navigate({ to: "/admin" });
+    } else {
+      navigate({ to: "/" });
+    }
   }
 
   async function onResetSubmit(data: ResetData) {

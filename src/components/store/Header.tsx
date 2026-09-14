@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingCart, MapPin, Menu, PackagePlus, LogIn, LogOut, User, LayoutPanelLeft } from "lucide-react";
+import { Search, ShoppingCart, MapPin, Menu, PackagePlus, LogIn, LogOut, User, LayoutPanelLeft, Image } from "lucide-react";
 import logo from "@/assets/icone.png";
 import { categorias } from "@/data/products";
 import { useCart } from "@/lib/cart";
@@ -109,6 +109,12 @@ export function Header() {
             </Link>
           ))}
           <span className="shrink-0 font-medium text-gold-deep">Ofertas do dia</span>
+          <Link
+            to="/flyers"
+            className="shrink-0 flex items-center gap-1 font-medium text-gold-deep hover:text-gold"
+          >
+            <Image className="h-4 w-4" /> Flyers
+          </Link>
           {user && (
             <Link
               to="/cadastrar-produto"
@@ -119,10 +125,10 @@ export function Header() {
           )}
           {isAdmin && (
             <Link
-              to="/admin/slides"
+              to="/admin"
               className="flex shrink-0 items-center gap-1 font-medium text-gold-deep hover:text-gold"
             >
-              <LayoutPanelLeft className="h-4 w-4" /> Gerenciar slides
+              <LayoutPanelLeft className="h-4 w-4" /> Admin
             </Link>
           )}
         </div>

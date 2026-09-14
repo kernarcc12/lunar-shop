@@ -107,3 +107,51 @@ CREATE POLICY "Admins podem deletar slides"
 
 -- 15. Índice para ordenação
 CREATE INDEX IF NOT EXISTS idxSlidesOrdem ON slides(ordem);
+
+-- ============================================
+-- FLYERS - Tabela de Flyers Estáticos e Animados
+-- ============================================
+
+-- 16. Tabela de flyers
+CREATE TABLE IF NOT EXISTS flyers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  titulo TEXT NOT NULL DEFAULT '',
+  descricao TEXT NOT NULL DEFAULT '',
+  imagem TEXT NOT NULL DEFAULT '',
+  link TEXT NOT NULL DEFAULT '',
+  tipo TEXT NOT NULL DEFAULT 'estatico' CHECK (tipo IN ('estatico', 'animado')),
+  ativo BOOLEAN NOT NULL DEFAULT true,
+  ordem INTEGER NOT NULL DEFAULT 0,
+  criado_em TIMESTAMPTZ NOT DEFAULT now()
+);
+
+-- 17. Habilitar RLS
+ALTER TABLE flyers ENABLE ROW LEVEL SECURITY;
+
+-- 18. Política: qualquer pessoa pode ler flyers ativos
+CREATE POLICY "Flyers ativos são públicos para leitura"
+  ON flyers FOR SELECT
+  USING (ativo = true);
+
+-- 19. Política: admins podem ver todos os flyers
+CREATE POLICY "Admins podem ver todos os flyers"
+  ON flyers FOR SELECT
+  USING (auth.jwt() -> 'app_metadata' ->> 'role' = 'admin');
+
+-- 20. Política: apenas admins podem inserir flyers
+CREATE POLICY "Admins podem cadastrar flyers"
+  ON flyers FOR INSERT
+  WITH CHECK (auth.jwt() -> 'app_metadata' ->> 'role' = 'admin');
+
+-- 21. Política: apenas admins podem editar flyers
+CREATE POLICY "Admins podem editar flyers"
+  ON flyers FOR UPDATE
+  USING (auth.jwt() -> 'app_metadata' ->> 'role' = 'admin');
+
+-- 22. Política: apenas admins podem deletar flyers
+CREATE POLICY "Admins podem deletar flyers"
+  ON flyers FOR DELETE
+  USING (auth.jwt() -> 'app_metadata' ->> 'role' = 'admin');
+
+-- 23. Índice para ordenação
+CREATE INDEX IF NOT EXISTS idxFlyersOrdem ON flyers(ordem);

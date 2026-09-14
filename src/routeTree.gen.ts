@@ -10,12 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminSlidesRouteImport } from './routes/admin.slides'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CadastrarProdutoRouteImport } from './routes/cadastrar-produto'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
+import { Route as FlyersRouteImport } from './routes/flyers'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as AdminFlyersRouteImport } from './routes/admin.flyers'
+import { Route as AdminSlidesRouteImport } from './routes/admin.slides'
 import { Route as EditarProdutoIdRouteImport } from './routes/editar-produto.$id'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 
@@ -24,9 +27,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminSlidesRoute = AdminSlidesRouteImport.update({
-  id: '/admin/slides',
-  path: '/admin/slides',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CadastrarProdutoRoute = CadastrarProdutoRouteImport.update({
@@ -44,6 +47,11 @@ const CarrinhoRoute = CarrinhoRouteImport.update({
   path: '/carrinho',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FlyersRoute = FlyersRouteImport.update({
+  id: '/flyers',
+  path: '/flyers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -53,6 +61,16 @@ const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
   path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminFlyersRoute = AdminFlyersRouteImport.update({
+  id: '/flyers',
+  path: '/flyers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSlidesRoute = AdminSlidesRouteImport.update({
+  id: '/slides',
+  path: '/slides',
+  getParentRoute: () => AdminRoute,
 } as any)
 const EditarProdutoIdRoute = EditarProdutoIdRouteImport.update({
   id: '/editar-produto/$id',
@@ -67,35 +85,44 @@ const ProdutoIdRoute = ProdutoIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin/slides': typeof AdminSlidesRoute
+  '/admin': typeof AdminRouteWithChildren
   '/cadastrar-produto': typeof CadastrarProdutoRoute
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
+  '/flyers': typeof FlyersRoute
   '/login': typeof LoginRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/admin/flyers': typeof AdminFlyersRoute
+  '/admin/slides': typeof AdminSlidesRoute
   '/editar-produto/$id': typeof EditarProdutoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin/slides': typeof AdminSlidesRoute
+  '/admin': typeof AdminRouteWithChildren
   '/cadastrar-produto': typeof CadastrarProdutoRoute
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
+  '/flyers': typeof FlyersRoute
   '/login': typeof LoginRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/admin/flyers': typeof AdminFlyersRoute
+  '/admin/slides': typeof AdminSlidesRoute
   '/editar-produto/$id': typeof EditarProdutoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin/slides': typeof AdminSlidesRoute
+  '/admin': typeof AdminRouteWithChildren
   '/cadastrar-produto': typeof CadastrarProdutoRoute
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
+  '/flyers': typeof FlyersRoute
   '/login': typeof LoginRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/admin/flyers': typeof AdminFlyersRoute
+  '/admin/slides': typeof AdminSlidesRoute
   '/editar-produto/$id': typeof EditarProdutoIdRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
@@ -103,44 +130,54 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin/slides'
+    | '/admin'
     | '/cadastrar-produto'
     | '/cadastro'
     | '/carrinho'
+    | '/flyers'
     | '/login'
     | '/redefinir-senha'
+    | '/admin/flyers'
+    | '/admin/slides'
     | '/editar-produto/$id'
     | '/produto/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin/slides'
+    | '/admin'
     | '/cadastrar-produto'
     | '/cadastro'
     | '/carrinho'
+    | '/flyers'
     | '/login'
     | '/redefinir-senha'
+    | '/admin/flyers'
+    | '/admin/slides'
     | '/editar-produto/$id'
     | '/produto/$id'
   id:
     | '__root__'
     | '/'
-    | '/admin/slides'
+    | '/admin'
     | '/cadastrar-produto'
     | '/cadastro'
     | '/carrinho'
+    | '/flyers'
     | '/login'
     | '/redefinir-senha'
+    | '/admin/flyers'
+    | '/admin/slides'
     | '/editar-produto/$id'
     | '/produto/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminSlidesRoute: typeof AdminSlidesRoute
+  AdminRoute: typeof AdminRouteWithChildren
   CadastrarProdutoRoute: typeof CadastrarProdutoRoute
   CadastroRoute: typeof CadastroRoute
   CarrinhoRoute: typeof CarrinhoRoute
+  FlyersRoute: typeof FlyersRoute
   LoginRoute: typeof LoginRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   EditarProdutoIdRoute: typeof EditarProdutoIdRoute
@@ -156,11 +193,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/slides': {
-      id: '/admin/slides'
-      path: '/admin/slides'
-      fullPath: '/admin/slides'
-      preLoaderRoute: typeof AdminSlidesRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cadastrar-produto': {
@@ -184,6 +221,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CarrinhoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/flyers': {
+      id: '/flyers'
+      path: '/flyers'
+      fullPath: '/flyers'
+      preLoaderRoute: typeof FlyersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -197,6 +241,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/redefinir-senha'
       preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/flyers': {
+      id: '/admin/flyers'
+      path: '/flyers'
+      fullPath: '/admin/flyers'
+      preLoaderRoute: typeof AdminFlyersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/slides': {
+      id: '/admin/slides'
+      path: '/slides'
+      fullPath: '/admin/slides'
+      preLoaderRoute: typeof AdminSlidesRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/editar-produto/$id': {
       id: '/editar-produto/$id'
@@ -215,12 +273,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminFlyersRoute: typeof AdminFlyersRoute
+  AdminSlidesRoute: typeof AdminSlidesRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminFlyersRoute: AdminFlyersRoute,
+  AdminSlidesRoute: AdminSlidesRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminSlidesRoute: AdminSlidesRoute,
+  AdminRoute: AdminRouteWithChildren,
   CadastrarProdutoRoute: CadastrarProdutoRoute,
   CadastroRoute: CadastroRoute,
   CarrinhoRoute: CarrinhoRoute,
+  FlyersRoute: FlyersRoute,
   LoginRoute: LoginRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   EditarProdutoIdRoute: EditarProdutoIdRoute,
