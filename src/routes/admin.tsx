@@ -576,6 +576,7 @@ function ProdutosSection() {
       return;
     }
     setImagemFile(file);
+    form.setValue("imagem", "uploaded");
     const reader = new FileReader();
     reader.onload = (event) => {
       setImagemPreview(event.target?.result as string);
@@ -1063,6 +1064,7 @@ function SlidesSection() {
       return;
     }
     setImagemFile(file);
+    form.setValue("imagem", "uploaded");
     const reader = new FileReader();
     reader.onload = (event) => {
       setImagemPreview(event.target?.result as string);
@@ -1600,6 +1602,7 @@ function FlyersSection() {
     const isAnimated = file.type === "image/gif" || file.type === "image/webp";
     if (isAnimated) form.setValue("tipo", "animado");
     setImagemFile(file);
+    form.setValue("imagem", "uploaded");
     const reader = new FileReader();
     reader.onload = (event) => {
       setImagemPreview(event.target?.result as string);
