@@ -3,7 +3,7 @@ import { supabase } from "./supabase";
 const BUCKET = "images";
 
 const RESIZE_MAP: Record<UploadFolder, { width: number; height: number } | null> = {
-  flyers: { width: 1080, height: 1920 },
+  flyers: { width: 1080, height: 2005 },
   slides: { width: 1920, height: 720 },
   produtos: { width: 1024, height: 1024 },
 };
