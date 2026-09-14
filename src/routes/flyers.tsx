@@ -181,13 +181,25 @@ function FlyersPage() {
                   <p className="mt-2 text-muted-foreground">{selectedFlyer.descricao}</p>
                 )}
                 {selectedFlyer.link && (
-                  <Link
-                    to={selectedFlyer.link.startsWith("http") ? "/" : selectedFlyer.link}
-                    className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Ver oferta
-                  </Link>
+                  selectedFlyer.link.startsWith("http") ? (
+                    <a
+                      href={selectedFlyer.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Ver oferta
+                    </a>
+                  ) : (
+                    <Link
+                      to={selectedFlyer.link}
+                      className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Ver oferta
+                    </Link>
+                  )
                 )}
               </div>
             )}
