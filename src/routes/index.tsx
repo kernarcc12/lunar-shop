@@ -9,7 +9,6 @@ import { categorias, type Product } from "@/data/products";
 import { supabase } from "@/lib/supabase";
 
 const PAGE_SIZE = 20;
-const PRODUTO_COLUMNS = "id, nome, categoria, preco, preco_antigo, imagem, parcelas, frete_gratis, avaliacao, vendidos, descricao";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,7 +44,7 @@ function Home() {
       const to = from + PAGE_SIZE - 1;
       const { data } = await supabase
         .from("produtos")
-        .select(PRODUTO_COLUMNS)
+        .select("*")
         .order("criado_em", { ascending: false })
         .range(from, to);
       return (data ?? []) as Product[];

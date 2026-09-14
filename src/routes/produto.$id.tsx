@@ -40,7 +40,7 @@ function salvarAvaliacao(avaliacao: Avaliacao) {
   localStorage.setItem(REVIEWS_KEY, JSON.stringify(todas));
 }
 
-const PRODUTO_COLUMNS = "id, nome, categoria, preco, preco_antigo, imagem, parcelas, frete_gratis, avaliacao, vendidos, descricao";
+const PRODUTO_COLUMNS = "*";
 
 export const Route = createFileRoute("/produto/$id")({
   head: () => ({

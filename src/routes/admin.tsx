@@ -417,7 +417,7 @@ function ProdutosSection() {
     setLoading(true);
     const { data, error } = await supabase
       .from("produtos")
-      .select("id, nome, categoria, preco, preco_antigo, imagem, parcelas, frete_gratis, avaliacao, vendidos, descricao, criado_por, criado_em")
+      .select("*")
       .order("criado_em", { ascending: false });
 
     if (error) {
@@ -920,7 +920,7 @@ function SlidesSection() {
     setLoading(true);
     const { data, error } = await supabase
       .from("slides")
-      .select("id, titulo, subtitulo, descricao, imagem, link, texto_botao, cor_fundo, cor_texto, ativo, ordem, criado_em")
+      .select("*")
       .order("ordem", { ascending: true });
     if (error) setErro(error.message);
     else setSlides(data || []);
@@ -1454,7 +1454,7 @@ function FlyersSection() {
     setLoading(true);
     const { data, error } = await supabase
       .from("flyers")
-      .select("id, titulo, descricao, imagem, link, tipo, ativo, ordem, criado_em")
+      .select("*")
       .order("ordem", { ascending: true });
     if (error) setErro(error.message);
     else setFlyers(data || []);
