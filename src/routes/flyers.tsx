@@ -156,29 +156,29 @@ function FlyersPage() {
           onClick={() => setSelectedFlyer(null)}
         >
           <div
-            className="relative max-h-[90vh] w-full max-w-md overflow-hidden rounded-2xl bg-card shadow-2xl"
+            className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-card shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setSelectedFlyer(null)}
-              className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+              className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white text-sm transition-colors hover:bg-black/70"
             >
               ✕
             </button>
             <img
               src={selectedFlyer.imagem}
               alt={selectedFlyer.titulo || "Flyer"}
-              className="w-full object-contain"
+              className="max-h-[50vh] w-full object-contain"
             />
             {(selectedFlyer.titulo || selectedFlyer.descricao) && (
-              <div className="p-6">
+              <div className="p-4">
                 {selectedFlyer.titulo && (
-                  <h3 className="text-xl font-semibold text-foreground">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {selectedFlyer.titulo}
                   </h3>
                 )}
                 {selectedFlyer.descricao && (
-                  <p className="mt-2 text-muted-foreground">{selectedFlyer.descricao}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{selectedFlyer.descricao}</p>
                 )}
                 {selectedFlyer.link && (
                   selectedFlyer.link.startsWith("http") ? (
@@ -186,7 +186,7 @@ function FlyersPage() {
                       href={selectedFlyer.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
+                      className="mt-3 inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
                     >
                       <ExternalLink className="h-4 w-4" />
                       Ver oferta
@@ -194,7 +194,7 @@ function FlyersPage() {
                   ) : (
                     <Link
                       to={selectedFlyer.link}
-                      className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
+                      className="mt-3 inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
                     >
                       <ExternalLink className="h-4 w-4" />
                       Ver oferta
