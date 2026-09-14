@@ -156,7 +156,7 @@ function FlyersPage() {
           onClick={() => setSelectedFlyer(null)}
         >
           <div
-            className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-card shadow-2xl"
+            className="relative w-full max-w-sm rounded-2xl bg-card shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -168,7 +168,7 @@ function FlyersPage() {
             <img
               src={selectedFlyer.imagem}
               alt={selectedFlyer.titulo || "Flyer"}
-              className="max-h-[50vh] w-full object-contain"
+              className="w-full object-contain"
             />
             {(selectedFlyer.titulo || selectedFlyer.descricao) && (
               <div className="p-4">
