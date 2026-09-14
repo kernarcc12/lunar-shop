@@ -35,11 +35,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-async function resizeImage(
-  dataUrl: string,
-  targetW: number,
-  targetH: number,
-): Promise<Blob> {
+async function resizeImage(dataUrl: string, targetW: number, targetH: number): Promise<Blob> {
   const img = await loadImage(dataUrl);
 
   const srcRatio = img.naturalWidth / img.naturalHeight;
@@ -85,10 +81,7 @@ function dataUrlToBlob(dataUrl: string): Blob {
 
 export type UploadFolder = "produtos" | "slides" | "flyers";
 
-export async function uploadImage(
-  folder: UploadFolder,
-  imageData: string,
-): Promise<string> {
+export async function uploadImage(folder: UploadFolder, imageData: string): Promise<string> {
   if (!isBase64(imageData)) {
     return imageData;
   }

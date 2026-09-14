@@ -75,10 +75,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lunar Produtos" },
-      { name: "description", content: "Loja online de tecnologia, fragrâncias e variedades." },
+      {
+        name: "description",
+        content: "Curadoria de produtos com os melhores preços. Compre pelo nosso Instagram.",
+      },
       { name: "author", content: "Lunar Produtos" },
       { property: "og:title", content: "Lunar Produtos" },
-      { property: "og:description", content: "Loja online de tecnologia, fragrâncias e variedades." },
+      {
+        property: "og:description",
+        content: "Curadoria de produtos com os melhores preços. Compre pelo nosso Instagram.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

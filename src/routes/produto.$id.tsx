@@ -44,9 +44,7 @@ const PRODUTO_COLUMNS = "*";
 
 export const Route = createFileRoute("/produto/$id")({
   head: () => ({
-    meta: [
-      { title: "Produto | Lunar Produtos" },
-    ],
+    meta: [{ title: "Produto | Lunar Produtos" }],
   }),
   component: ProdutoPage,
 });
@@ -282,18 +280,13 @@ function ProdutoPage() {
               Enviar avaliação
             </button>
 
-            {enviado && (
-              <p className="mt-2 text-sm text-success">Avaliação enviada com sucesso!</p>
-            )}
+            {enviado && <p className="mt-2 text-sm text-success">Avaliação enviada com sucesso!</p>}
           </div>
 
           {avaliacoes.length > 0 && (
             <div className="mt-6 space-y-4">
               {avaliacoes.map((avaliacao) => (
-                <div
-                  key={avaliacao.id}
-                  className="rounded-lg border border-border p-4"
-                >
+                <div key={avaliacao.id} className="rounded-lg border border-border p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-medium text-gold">

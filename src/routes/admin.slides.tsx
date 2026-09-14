@@ -202,10 +202,7 @@ function AdminSlides() {
     };
 
     if (editingSlide) {
-      const { error } = await supabase
-        .from("slides")
-        .update(slideData)
-        .eq("id", editingSlide.id);
+      const { error } = await supabase.from("slides").update(slideData).eq("id", editingSlide.id);
 
       if (error) {
         setErro(error.message);
@@ -259,24 +256,12 @@ function AdminSlides() {
     const idx = slides.findIndex((s) => s.id === slide.id);
     if (direction === "up" && idx > 0) {
       const prev = slides[idx - 1]!;
-      await supabase
-        .from("slides")
-        .update({ ordem: prev.ordem })
-        .eq("id", slide.id);
-      await supabase
-        .from("slides")
-        .update({ ordem: slide.ordem })
-        .eq("id", prev.id);
+      await supabase.from("slides").update({ ordem: prev.ordem }).eq("id", slide.id);
+      await supabase.from("slides").update({ ordem: slide.ordem }).eq("id", prev.id);
     } else if (direction === "down" && idx < slides.length - 1) {
       const next = slides[idx + 1]!;
-      await supabase
-        .from("slides")
-        .update({ ordem: next.ordem })
-        .eq("id", slide.id);
-      await supabase
-        .from("slides")
-        .update({ ordem: slide.ordem })
-        .eq("id", next.id);
+      await supabase.from("slides").update({ ordem: next.ordem }).eq("id", slide.id);
+      await supabase.from("slides").update({ ordem: slide.ordem }).eq("id", next.id);
     }
     fetchSlides();
   }
@@ -349,10 +334,7 @@ function AdminSlides() {
                 Configure os slides do slideshow da página inicial.
               </p>
             </div>
-            <Button
-              onClick={openNewForm}
-              className="bg-brand text-gold hover:bg-brand-soft"
-            >
+            <Button onClick={openNewForm} className="bg-brand text-gold hover:bg-brand-soft">
               <Plus className="mr-2 h-4 w-4" />
               Novo slide
             </Button>
@@ -415,11 +397,7 @@ function AdminSlides() {
                       <FormItem>
                         <FormLabel>Descrição</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="Descrição curta do slide..."
-                            rows={2}
-                            {...field}
-                          />
+                          <Textarea placeholder="Descrição curta do slide..." rows={2} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

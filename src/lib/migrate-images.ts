@@ -11,15 +11,10 @@ function isBase64(value: string): boolean {
   return value.startsWith("data:");
 }
 
-async function migrateTable(
-  table: string,
-  folder: UploadFolder,
-): Promise<MigrationResult> {
+async function migrateTable(table: string, folder: UploadFolder): Promise<MigrationResult> {
   const result: MigrationResult = { migrated: 0, skipped: 0, errors: 0 };
 
-  const { data: rows, error: fetchError } = await supabase
-    .from(table)
-    .select("id, imagem");
+  const { data: rows, error: fetchError } = await supabase.from(table).select("id, imagem");
 
   if (fetchError || !rows) {
     console.error(`Erro ao buscar ${table}:`, fetchError);

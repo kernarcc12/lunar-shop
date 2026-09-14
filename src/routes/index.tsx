@@ -1,29 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { ShieldCheck, Truck, CreditCard, Sparkles } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
 import { Slideshow } from "@/components/store/Slideshow";
+import { CategoryBar } from "@/components/store/CategoryBar";
+import { FeaturedDeals } from "@/components/store/FeaturedDeals";
+import { TrendingSection } from "@/components/store/TrendingSection";
 import { categorias, type Product } from "@/data/products";
 import { supabase } from "@/lib/supabase";
-
-const PAGE_SIZE = 20;
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Lunar Produtos | Tecnologia, Fragrâncias e Variedades" },
+      { title: "Lunar Produtos | Curadoria de Produtos pelo Instagram" },
       {
         name: "description",
         content:
-          "Compre eletrônicos, perfumes e itens para casa na Lunar Produtos. Ofertas com frete grátis, parcelamento em até 12x e entrega rápida.",
+          "Produtos selecionados com os melhores preços. Compre pelo Instagram e receba em todo o Brasil.",
       },
-      { property: "og:title", content: "Lunar Produtos | Loja online de variedades" },
+      { property: "og:title", content: "Lunar Produtos | Curadoria de Produtos" },
       {
         property: "og:description",
-        content:
-          "Tecnologia, fragrâncias e acessórios com preços de oferta e envio para todo o Brasil.",
+        content: "Curadoria de produtos com os melhores preços. Compre pelo nosso Instagram.",
       },
     ],
   }),
@@ -31,33 +30,18 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const {
-    data,
-    fetchNextPage,
-    isFetchingNextPage,
-    hasNextPage,
-    isLoading,
-  } = useInfiniteQuery({
+  const { data: produtos = [], isLoading } = useQuery({
     queryKey: ["produtos", "catalogo"],
-    queryFn: async ({ pageParam = 0 }) => {
-      const from = pageParam * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
+    queryFn: async () => {
       const { data } = await supabase
         .from("produtos")
         .select("*")
-        .order("criado_em", { ascending: false })
-        .range(from, to);
+        .order("criado_em", { ascending: false });
       return (data ?? []) as Product[];
     },
-    getNextPageParam: (lastPage: Product[], allPages: Product[][]) => {
-      if (lastPage.length < PAGE_SIZE) return undefined;
-      return allPages.length;
-    },
     staleTime: 5 * 60 * 1000,
-    initialPageParam: 0,
   });
 
-  const produtos = data?.pages.flatMap((page: Product[]) => page) ?? [];
   const ofertas = produtos.filter((p: Product) => p.precoAntigo);
 
   return (
@@ -66,94 +50,38 @@ function Home() {
 
       <Slideshow />
 
-      <section className="bg-brand">
-        <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-10 md:grid-cols-2">
-          <div>
-            <p className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold">
-              <Sparkles className="h-4 w-4" /> NOVIDADES LUNAR
-            </p>
-            <h1 className="mt-3 font-display text-3xl leading-tight text-brand-foreground md:text-5xl">
-              Tecnologia e variedades para você
-            </h1>
-            <p className="mt-3 max-w-md text-sm text-brand-foreground/70">
-              Produtos selecionados, novidades e ofertas especiais em um só lugar.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-sm text-brand-foreground/80">
-            {[
-              { icon: Truck, t: "Enviamos para você", d: "Consulte as opções de entrega" },
-              {
-                icon: CreditCard,
-                t: "Facilidade no pagamento",
-                d: "Escolha a melhor forma para você",
-              },
-              {
-                icon: ShieldCheck,
-                t: "Produtos selecionados",
-                d: "Qualidade e variedade em um só lugar",
-              },
-              {
-                icon: Sparkles,
-                t: "Sempre tem novidade",
-                d: "Acompanhe nossas novidades no Instagram",
-              },
-            ].map((b) => (
-              <div key={b.t} className="rounded-lg border border-gold/20 bg-brand-soft p-4">
-                <b.icon className="h-5 w-5 text-gold" />
-                <p className="mt-2 font-medium text-brand-foreground">{b.t}</p>
-                <p className="text-xs">{b.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CategoryBar />
 
-      <main className="mx-auto max-w-7xl px-4 py-8">
-        {isLoading ? (
-          <div className="py-16 text-center text-muted-foreground">Carregando produtos...</div>
-        ) : (
-          <>
-            <section>
-              <div className="mb-4 flex items-end justify-between">
-                <h2 className="text-xl font-semibold text-foreground">Ofertas do dia</h2>
-                <span className="text-sm text-gold-deep">Promoções por tempo limitado</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {ofertas.map((p: Product) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
-              </div>
-            </section>
+      {isLoading ? (
+        <div className="py-16 text-center text-muted-foreground">Carregando produtos...</div>
+      ) : (
+        <>
+          {ofertas.length > 0 && <FeaturedDeals products={ofertas} />}
 
-            {categorias.map((cat) => {
-              const lista = produtos.filter((p: Product) => p.categoria === cat);
-              if (!lista.length) return null;
-              return (
-                <section key={cat} id={cat.toLowerCase().replace(/\W+/g, "-")} className="mt-10">
-                  <h2 className="mb-4 text-xl font-semibold text-foreground">{cat}</h2>
-                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {produtos.length > 0 && <TrendingSection products={produtos} />}
+
+          {categorias.map((cat) => {
+            const lista = produtos.filter((p: Product) => p.categoria === cat);
+            if (!lista.length) return null;
+            return (
+              <section
+                key={cat}
+                id={cat.toLowerCase().replace(/\W+/g, "-")}
+                className="bg-white py-8"
+              >
+                <div className="mx-auto max-w-7xl px-4">
+                  <h2 className="mb-6 text-xl font-bold text-foreground md:text-2xl">{cat}</h2>
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
                     {lista.map((p: Product) => (
                       <ProductCard key={p.id} product={p} />
                     ))}
                   </div>
-                </section>
-              );
-            })}
-          </>
-        )}
-
-        {hasNextPage && (
-          <div className="mt-8 flex justify-center">
-            <button
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              className="rounded-md border border-border bg-card px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50"
-            >
-              {isFetchingNextPage ? "Carregando..." : "Carregar mais produtos"}
-            </button>
-          </div>
-        )}
-      </main>
+                </div>
+              </section>
+            );
+          })}
+        </>
+      )}
 
       <Footer />
     </div>

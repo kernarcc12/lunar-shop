@@ -88,11 +88,7 @@ const produtoSchema = z.object({
     .optional()
     .or(z.literal("")),
   imagem: z.string().optional(),
-  parcelas: z.coerce
-    .number()
-    .int()
-    .min(1, "Mínimo 1 parcela")
-    .max(48, "Máximo 48 parcelas"),
+  parcelas: z.coerce.number().int().min(1, "Mínimo 1 parcela").max(48, "Máximo 48 parcelas"),
   freteGratis: z.boolean(),
   avaliacao: z.coerce.number().min(0, "Mínimo 0").max(5, "Máximo 5"),
   descricao: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
@@ -361,10 +357,7 @@ function DashboardSection() {
         {cards.map((c) => {
           const Icon = c.icon;
           return (
-            <div
-              key={c.label}
-              className="rounded-xl border border-border bg-card p-6"
-            >
+            <div key={c.label} className="rounded-xl border border-border bg-card p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">{c.label}</p>
@@ -516,8 +509,7 @@ function ProdutosSection() {
       nome: data.nome,
       categoria: data.categoria,
       preco: data.preco,
-      preco_antigo:
-        data.precoAntigo && data.precoAntigo > 0 ? data.precoAntigo : null,
+      preco_antigo: data.precoAntigo && data.precoAntigo > 0 ? data.precoAntigo : null,
       imagem: imagemUrl,
       parcelas: data.parcelas,
       frete_gratis: data.freteGratis,
@@ -565,17 +557,14 @@ function ProdutosSection() {
     }
   }
 
-  const brl = (v: number) =>
-    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-foreground">Produtos</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Gerencie os produtos da loja.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">Gerencie os produtos da loja.</p>
         </div>
         <Button onClick={openNewForm} className="bg-brand text-gold hover:bg-brand-soft">
           <Plus className="mr-2 h-4 w-4" />
@@ -773,11 +762,7 @@ function ProdutosSection() {
                   <FormItem>
                     <FormLabel>Descrição</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Descreva o produto..."
-                        rows={3}
-                        {...field}
-                      />
+                      <Textarea placeholder="Descreva o produto..." rows={3} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -821,18 +806,12 @@ function ProdutosSection() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-accent/30">
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Produto
-                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Produto</th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                     Categoria
                   </th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Preço
-                  </th>
-                  <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                    Ações
-                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Preço</th>
+                  <th className="px-4 py-3 text-right font-medium text-muted-foreground">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -1026,15 +1005,18 @@ function SlidesSection() {
       ordem: data.ordem,
     };
     if (editingSlide) {
-      const { error } = await supabase
-        .from("slides")
-        .update(slideData)
-        .eq("id", editingSlide.id);
-      if (error) { setErro(error.message); return; }
+      const { error } = await supabase.from("slides").update(slideData).eq("id", editingSlide.id);
+      if (error) {
+        setErro(error.message);
+        return;
+      }
       setSucesso("Slide atualizado com sucesso!");
     } else {
       const { error } = await supabase.from("slides").insert(slideData);
-      if (error) { setErro(error.message); return; }
+      if (error) {
+        setErro(error.message);
+        return;
+      }
       setSucesso("Slide criado com sucesso!");
     }
     setShowForm(false);
@@ -1049,7 +1031,10 @@ function SlidesSection() {
     if (!confirm("Tem certeza que deseja excluir este slide?")) return;
     const { error } = await supabase.from("slides").delete().eq("id", id);
     if (error) setErro(error.message);
-    else { setSucesso("Slide excluído com sucesso!"); fetchSlides(); }
+    else {
+      setSucesso("Slide excluído com sucesso!");
+      fetchSlides();
+    }
   }
 
   async function toggleAtivo(slide: Slide) {
@@ -1500,13 +1485,7 @@ function FlyersSection() {
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const validTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "image/svg+xml",
-    ];
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
     if (!validTypes.includes(file.type)) {
       setErro("Selecione um arquivo de imagem válido (JPG, PNG, GIF, WebP, SVG)");
       return;
@@ -1583,15 +1562,18 @@ function FlyersSection() {
       ordem: data.ordem,
     };
     if (editingFlyer) {
-      const { error } = await supabase
-        .from("flyers")
-        .update(flyerData)
-        .eq("id", editingFlyer.id);
-      if (error) { setErro(error.message); return; }
+      const { error } = await supabase.from("flyers").update(flyerData).eq("id", editingFlyer.id);
+      if (error) {
+        setErro(error.message);
+        return;
+      }
       setSucesso("Flyer atualizado com sucesso!");
     } else {
       const { error } = await supabase.from("flyers").insert(flyerData);
-      if (error) { setErro(error.message); return; }
+      if (error) {
+        setErro(error.message);
+        return;
+      }
       setSucesso("Flyer criado com sucesso!");
     }
     setShowForm(false);
@@ -1606,7 +1588,10 @@ function FlyersSection() {
     if (!confirm("Tem certeza que deseja excluir este flyer?")) return;
     const { error } = await supabase.from("flyers").delete().eq("id", id);
     if (error) setErro(error.message);
-    else { setSucesso("Flyer excluído com sucesso!"); fetchFlyers(); }
+    else {
+      setSucesso("Flyer excluído com sucesso!");
+      fetchFlyers();
+    }
   }
 
   async function toggleAtivo(flyer: Flyer) {
@@ -1773,7 +1758,8 @@ function FlyersSection() {
                       </div>
                     </FormControl>
                     <FormDescription>
-                      Recomendado: 1080x1920px (formato vertical). GIFs e WebP animados são detectados automaticamente.
+                      Recomendado: 1080x1920px (formato vertical). GIFs e WebP animados são
+                      detectados automaticamente.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

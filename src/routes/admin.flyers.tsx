@@ -223,10 +223,7 @@ function AdminFlyers() {
     };
 
     if (editingFlyer) {
-      const { error } = await supabase
-        .from("flyers")
-        .update(flyerData)
-        .eq("id", editingFlyer.id);
+      const { error } = await supabase.from("flyers").update(flyerData).eq("id", editingFlyer.id);
 
       if (error) {
         setErro(error.message);
@@ -280,24 +277,12 @@ function AdminFlyers() {
     const idx = flyers.findIndex((f) => f.id === flyer.id);
     if (direction === "up" && idx > 0) {
       const prev = flyers[idx - 1]!;
-      await supabase
-        .from("flyers")
-        .update({ ordem: prev.ordem })
-        .eq("id", flyer.id);
-      await supabase
-        .from("flyers")
-        .update({ ordem: flyer.ordem })
-        .eq("id", prev.id);
+      await supabase.from("flyers").update({ ordem: prev.ordem }).eq("id", flyer.id);
+      await supabase.from("flyers").update({ ordem: flyer.ordem }).eq("id", prev.id);
     } else if (direction === "down" && idx < flyers.length - 1) {
       const next = flyers[idx + 1]!;
-      await supabase
-        .from("flyers")
-        .update({ ordem: next.ordem })
-        .eq("id", flyer.id);
-      await supabase
-        .from("flyers")
-        .update({ ordem: flyer.ordem })
-        .eq("id", next.id);
+      await supabase.from("flyers").update({ ordem: next.ordem }).eq("id", flyer.id);
+      await supabase.from("flyers").update({ ordem: flyer.ordem }).eq("id", next.id);
     }
     fetchFlyers();
   }
@@ -370,10 +355,7 @@ function AdminFlyers() {
                 Cadastre flyers estáticos e animados para a página de ofertas.
               </p>
             </div>
-            <Button
-              onClick={openNewForm}
-              className="bg-brand text-gold hover:bg-brand-soft"
-            >
+            <Button onClick={openNewForm} className="bg-brand text-gold hover:bg-brand-soft">
               <Plus className="mr-2 h-4 w-4" />
               Novo flyer
             </Button>
@@ -437,11 +419,7 @@ function AdminFlyers() {
                       <FormItem>
                         <FormLabel>Descrição (opcional)</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="Descrição curta do flyer..."
-                            rows={2}
-                            {...field}
-                          />
+                          <Textarea placeholder="Descrição curta do flyer..." rows={2} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -516,7 +494,8 @@ function AdminFlyers() {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          Imagem do flyer (recomendado: 1080x1920px - formato vertical). GIFs e WebP animados são detectados automaticamente.
+                          Imagem do flyer (recomendado: 1080x1920px - formato vertical). GIFs e WebP
+                          animados são detectados automaticamente.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

@@ -35,7 +35,11 @@ const schema = z.object({
   nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   categoria: z.string().min(1, "Selecione uma categoria"),
   preco: z.coerce.number().positive("Preço deve ser maior que zero"),
-  precoAntigo: z.coerce.number().positive("Preço antigo deve ser maior que zero").optional().or(z.literal("")),
+  precoAntigo: z.coerce
+    .number()
+    .positive("Preço antigo deve ser maior que zero")
+    .optional()
+    .or(z.literal("")),
   imagem: z.string().optional(),
   parcelas: z.coerce.number().int().min(1, "Mínimo 1 parcela").max(48, "Máximo 48 parcelas"),
   freteGratis: z.boolean(),
@@ -82,11 +86,7 @@ function EditarProduto() {
 
   useEffect(() => {
     async function carregarProduto() {
-      const { data, error } = await supabase
-        .from("produtos")
-        .select("*")
-        .eq("id", id)
-        .single();
+      const { data, error } = await supabase.from("produtos").select("*").eq("id", id).single();
 
       if (error || !data) {
         setErro("Produto não encontrado");
@@ -152,12 +152,9 @@ function EditarProduto() {
 
   async function excluirProduto() {
     if (!confirm("Tem certeza que deseja excluir este produto?")) return;
-    
+
     setExcluindo(true);
-    const { error } = await supabase
-      .from("produtos")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("produtos").delete().eq("id", id);
 
     if (error) {
       setErro(error.message);
@@ -222,9 +219,7 @@ function EditarProduto() {
         <main className="mx-auto max-w-md px-4 py-16 text-center">
           <div className="rounded-lg border border-border bg-card p-10">
             <h1 className="text-xl font-semibold text-foreground">Acesso restrito</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Faça login para editar produtos.
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Faça login para editar produtos.</p>
             <Link
               to="/login"
               className="mt-6 inline-flex items-center justify-center rounded-md bg-brand px-6 py-2.5 text-sm font-medium text-gold transition-colors hover:bg-brand-soft"
@@ -327,9 +322,7 @@ function EditarProduto() {
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border px-6 py-4">
             <h1 className="text-xl font-semibold text-foreground">Editar Produto</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Atualize os dados do produto.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Atualize os dados do produto.</p>
           </div>
 
           <Form {...form}>
@@ -494,9 +487,7 @@ function EditarProduto() {
                             className="flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border hover:border-gold/50 transition-colors"
                           >
                             <Upload className="h-8 w-8 text-muted-foreground" />
-                            <p className="mt-2 text-xs text-muted-foreground">
-                              Clique para enviar
-                            </p>
+                            <p className="mt-2 text-xs text-muted-foreground">Clique para enviar</p>
                           </div>
                         )}
                         <input
@@ -508,9 +499,7 @@ function EditarProduto() {
                         />
                       </div>
                     </FormControl>
-                    <FormDescription>
-                      Envie uma imagem do produto (JPG, PNG, etc.)
-                    </FormDescription>
+                    <FormDescription>Envie uma imagem do produto (JPG, PNG, etc.)</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

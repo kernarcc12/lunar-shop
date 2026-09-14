@@ -35,7 +35,11 @@ const schema = z.object({
   nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   categoria: z.string().min(1, "Selecione uma categoria"),
   preco: z.coerce.number().positive("Preço deve ser maior que zero"),
-  precoAntigo: z.coerce.number().positive("Preço antigo deve ser maior que zero").optional().or(z.literal("")),
+  precoAntigo: z.coerce
+    .number()
+    .positive("Preço antigo deve ser maior que zero")
+    .optional()
+    .or(z.literal("")),
   imagem: z.string().optional(),
   parcelas: z.coerce.number().int().min(1, "Mínimo 1 parcela").max(48, "Máximo 48 parcelas"),
   freteGratis: z.boolean(),
@@ -394,9 +398,7 @@ function CadastrarProduto() {
                             className="flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border hover:border-gold/50 transition-colors"
                           >
                             <Upload className="h-8 w-8 text-muted-foreground" />
-                            <p className="mt-2 text-xs text-muted-foreground">
-                              Clique para enviar
-                            </p>
+                            <p className="mt-2 text-xs text-muted-foreground">Clique para enviar</p>
                           </div>
                         )}
                         <input
@@ -408,9 +410,7 @@ function CadastrarProduto() {
                         />
                       </div>
                     </FormControl>
-                    <FormDescription>
-                      Envie uma imagem do produto (JPG, PNG, etc.)
-                    </FormDescription>
+                    <FormDescription>Envie uma imagem do produto (JPG, PNG, etc.)</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

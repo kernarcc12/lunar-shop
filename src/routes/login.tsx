@@ -143,10 +143,7 @@ function LoginPage() {
                       )}
                     />
 
-                    <Button
-                      type="submit"
-                      className="w-full bg-brand text-gold hover:bg-brand-soft"
-                    >
+                    <Button type="submit" className="w-full bg-brand text-gold hover:bg-brand-soft">
                       Enviar link de recuperação
                     </Button>
                   </form>
@@ -206,10 +203,7 @@ function LoginPage() {
                   </button>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full bg-brand text-gold hover:bg-brand-soft"
-                >
+                <Button type="submit" className="w-full bg-brand text-gold hover:bg-brand-soft">
                   <LogIn className="mr-2 h-4 w-4" />
                   Entrar
                 </Button>
@@ -236,10 +230,7 @@ function LoginPage() {
               ) : (
                 <>
                   Não tem conta?{" "}
-                  <Link
-                    to="/cadastro"
-                    className="font-medium text-gold-deep hover:text-gold"
-                  >
+                  <Link to="/cadastro" className="font-medium text-gold-deep hover:text-gold">
                     Cadastre-se
                   </Link>
                 </>

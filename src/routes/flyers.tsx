@@ -21,7 +21,10 @@ export const Route = createFileRoute("/flyers")({
   head: () => ({
     meta: [
       { title: "Flyers & Ofertas | Lunar Produtos" },
-      { name: "description", content: "Confira nossos flyers e ofertas especiais da Lunar Produtos." },
+      {
+        name: "description",
+        content: "Confira nossos flyers e ofertas especiais da Lunar Produtos.",
+      },
     ],
   }),
   component: FlyersPage,
@@ -88,9 +91,7 @@ function FlyersPage() {
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
                 <Image className="h-6 w-6 text-white/30" />
               </div>
-              <h2 className="mt-5 text-lg font-semibold text-white/80">
-                Nenhum flyer disponível
-              </h2>
+              <h2 className="mt-5 text-lg font-semibold text-white/80">Nenhum flyer disponível</h2>
               <p className="mt-2 text-sm text-white/40">
                 Em breve teremos novas promoções para você!
               </p>
@@ -158,13 +159,15 @@ function AutoScrollCarousel({ flyers }: { flyers: Flyer[] }) {
         <ArrowRight className="h-4 w-4" />
       </button>
 
-      <div
-        ref={scrollRef}
-        className="scrollbar-none flex gap-[5px] overflow-x-auto scroll-smooth px-4 pb-2"
-      >
-        {flyers.map((flyer) => (
-          <FlyerCard key={flyer.id} flyer={flyer} />
-        ))}
+      <div className="flex justify-center">
+        <div
+          ref={scrollRef}
+          className="scrollbar-none flex gap-[5px] overflow-x-auto scroll-smooth px-4 pb-2"
+        >
+          {flyers.map((flyer) => (
+            <FlyerCard key={flyer.id} flyer={flyer} />
+          ))}
+        </div>
       </div>
     </div>
   );

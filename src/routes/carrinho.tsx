@@ -49,10 +49,7 @@ function Carrinho() {
     queryKey: ["carrinho", ids.sort().join(",")],
     queryFn: async () => {
       if (ids.length === 0) return new Map<string, Product>();
-      const { data } = await supabase
-        .from("produtos")
-        .select("*")
-        .in("id", ids);
+      const { data } = await supabase.from("produtos").select("*").in("id", ids);
       return new Map((data ?? []).map((p) => [p.id, p])) as Map<string, Product>;
     },
     enabled: ids.length > 0,
@@ -223,9 +220,7 @@ function Carrinho() {
               <p className="mt-1 text-sm text-success">em 12x {brl(total / 12)} sem juros</p>
               <button
                 onClick={() => {
-                  const itensParaEnviar = linhasFiltradas.length > 0
-                    ? linhasFiltradas
-                    : linhas;
+                  const itensParaEnviar = linhasFiltradas.length > 0 ? linhasFiltradas : linhas;
                   const whatsappUrl = buildCartWhatsAppLink(
                     itensParaEnviar.map((l) => ({ produto: l.produto!, qtd: l.item.qtd })),
                   );

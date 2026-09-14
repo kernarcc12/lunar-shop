@@ -18,13 +18,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const schema = z.object({
-  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
-  confirmPassword: z.string().min(6, "Confirmação deve ter pelo menos 6 caracteres"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "As senhas não coincidem",
-  path: ["confirmPassword"],
-});
+const schema = z
+  .object({
+    password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+    confirmPassword: z.string().min(6, "Confirmação deve ter pelo menos 6 caracteres"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem",
+    path: ["confirmPassword"],
+  });
 
 type FormData = z.infer<typeof schema>;
 
@@ -90,9 +92,7 @@ function RedefinirSenhaPage() {
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border px-6 py-4 text-center">
             <h1 className="text-xl font-semibold text-foreground">Redefinir Senha</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Digite sua nova senha abaixo.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Digite sua nova senha abaixo.</p>
           </div>
 
           {!tokenValid ? (
@@ -152,10 +152,7 @@ function RedefinirSenhaPage() {
                   )}
                 />
 
-                <Button
-                  type="submit"
-                  className="w-full bg-brand text-gold hover:bg-brand-soft"
-                >
+                <Button type="submit" className="w-full bg-brand text-gold hover:bg-brand-soft">
                   <KeyRound className="mr-2 h-4 w-4" />
                   Redefinir senha
                 </Button>

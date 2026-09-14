@@ -13,12 +13,20 @@ export type Product = {
 };
 
 export const categorias = [
-  "Tecnologia",
+  "Acessórios",
   "Artesanato",
   "Caça & Pesca",
   "Cosméticos",
-  "Acessórios",
+  "Tecnologia",
 ] as const;
+
+export const categoriasComIcone: Record<string, string> = {
+  Acessórios: "accessories",
+  Artesanato: "palette",
+  "Caça & Pesca": "fish",
+  Cosméticos: "sparkles",
+  Tecnologia: "cpu",
+};
 
 const produtosIniciais: Product[] = [];
 
@@ -40,12 +48,8 @@ export function salvarProdutoCadastrado(produto: Product) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(existentes));
 }
 
-export const produtos: Product[] = [
-  ...produtosIniciais,
-  ...carregarProdutosCadastrados(),
-];
+export const produtos: Product[] = [...produtosIniciais, ...carregarProdutosCadastrados()];
 
-export const brl = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const getProduto = (id: string) => produtos.find((p) => p.id === id);
