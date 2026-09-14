@@ -1652,7 +1652,7 @@ function FlyersSection() {
                             <img
                               src={imagemPreview}
                               alt="Preview"
-                              className="h-80 w-45 rounded-lg border border-border object-cover"
+                              className="w-full max-w-[220px] aspect-[9/16] rounded-lg border border-border object-cover"
                             />
                             <button
                               type="button"
@@ -1679,7 +1679,7 @@ function FlyersSection() {
                             onDragLeave={handleDragLeave}
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
-                            className={`flex h-80 w-45 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
+                            className={`flex w-full max-w-[220px] aspect-[9/16] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
                               isDragging
                                 ? "border-gold bg-gold/5"
                                 : "border-border hover:border-gold/50"
