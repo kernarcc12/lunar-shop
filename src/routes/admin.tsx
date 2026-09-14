@@ -32,6 +32,7 @@ import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { uploadImage } from "@/lib/upload";
 import {
   Form,
   FormControl,
@@ -390,6 +391,7 @@ function ProdutosSection() {
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [imagemFile, setImagemFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProdutoFormData>({
@@ -415,7 +417,7 @@ function ProdutosSection() {
     setLoading(true);
     const { data, error } = await supabase
       .from("produtos")
-      .select("*")
+      .select("id, nome, categoria, preco, preco_antigo, imagem, parcelas, frete_gratis, avaliacao, vendidos, descricao, criado_por, criado_em")
       .order("criado_em", { ascending: false });
 
     if (error) {
@@ -429,6 +431,7 @@ function ProdutosSection() {
   function openNewForm() {
     setEditingProduto(null);
     setImagemPreview(null);
+    setImagemFile(null);
     form.reset({
       nome: "",
       categoria: "",
@@ -448,6 +451,7 @@ function ProdutosSection() {
   function openEditForm(produto: Produto) {
     setEditingProduto(produto);
     setImagemPreview(produto.imagem || null);
+    setImagemFile(null);
     form.reset({
       nome: produto.nome,
       categoria: produto.categoria,
@@ -471,17 +475,17 @@ function ProdutosSection() {
       setErro("Selecione um arquivo de imagem válido");
       return;
     }
+    setImagemFile(file);
     const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      setImagemPreview(base64);
-      form.setValue("imagem", base64);
+      setImagemPreview(event.target?.result as string);
     };
     reader.readAsDataURL(file);
   }
 
   function removeImage() {
     setImagemPreview(null);
+    setImagemFile(null);
     form.setValue("imagem", "");
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
@@ -490,13 +494,31 @@ function ProdutosSection() {
     setErro("");
     setSucesso("");
 
+    let imagemUrl = "";
+    if (imagemFile) {
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(imagemFile);
+        });
+        imagemUrl = await uploadImage("produtos", dataUrl);
+      } catch (err) {
+        setErro(err instanceof Error ? err.message : "Erro ao enviar imagem");
+        return;
+      }
+    } else if (imagemPreview) {
+      imagemUrl = imagemPreview;
+    }
+
     const produtoData = {
       nome: data.nome,
       categoria: data.categoria,
       preco: data.preco,
       preco_antigo:
         data.precoAntigo && data.precoAntigo > 0 ? data.precoAntigo : null,
-      imagem: data.imagem || "",
+      imagem: imagemUrl,
       parcelas: data.parcelas,
       frete_gratis: data.freteGratis,
       avaliacao: data.avaliacao,
@@ -527,6 +549,7 @@ function ProdutosSection() {
     setShowForm(false);
     setEditingProduto(null);
     setImagemPreview(null);
+    setImagemFile(null);
     form.reset();
     fetchProdutos();
   }
@@ -870,6 +893,7 @@ function SlidesSection() {
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [imagemFile, setImagemFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<SlideFormData>({
@@ -896,7 +920,7 @@ function SlidesSection() {
     setLoading(true);
     const { data, error } = await supabase
       .from("slides")
-      .select("*")
+      .select("id, titulo, subtitulo, descricao, imagem, link, texto_botao, cor_fundo, cor_texto, ativo, ordem, criado_em")
       .order("ordem", { ascending: true });
     if (error) setErro(error.message);
     else setSlides(data || []);
@@ -906,6 +930,7 @@ function SlidesSection() {
   function openNewForm() {
     setEditingSlide(null);
     setImagemPreview(null);
+    setImagemFile(null);
     form.reset({
       titulo: "",
       subtitulo: "",
@@ -926,6 +951,7 @@ function SlidesSection() {
   function openEditForm(slide: Slide) {
     setEditingSlide(slide);
     setImagemPreview(slide.imagem || null);
+    setImagemFile(null);
     form.reset({
       titulo: slide.titulo,
       subtitulo: slide.subtitulo || "",
@@ -950,17 +976,17 @@ function SlidesSection() {
       setErro("Selecione um arquivo de imagem válido");
       return;
     }
+    setImagemFile(file);
     const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      setImagemPreview(base64);
-      form.setValue("imagem", base64);
+      setImagemPreview(event.target?.result as string);
     };
     reader.readAsDataURL(file);
   }
 
   function removeImage() {
     setImagemPreview(null);
+    setImagemFile(null);
     form.setValue("imagem", "");
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
@@ -968,11 +994,30 @@ function SlidesSection() {
   async function onSubmit(data: SlideFormData) {
     setErro("");
     setSucesso("");
+
+    let imagemUrl = "";
+    if (imagemFile) {
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(imagemFile);
+        });
+        imagemUrl = await uploadImage("slides", dataUrl);
+      } catch (err) {
+        setErro(err instanceof Error ? err.message : "Erro ao enviar imagem");
+        return;
+      }
+    } else if (imagemPreview) {
+      imagemUrl = imagemPreview;
+    }
+
     const slideData = {
       titulo: data.titulo,
       subtitulo: data.subtitulo || "",
       descricao: data.descricao || "",
-      imagem: data.imagem || "",
+      imagem: imagemUrl,
       link: data.link || "",
       texto_botao: data.texto_botao || "",
       cor_fundo: data.cor_fundo,
@@ -995,6 +1040,7 @@ function SlidesSection() {
     setShowForm(false);
     setEditingSlide(null);
     setImagemPreview(null);
+    setImagemFile(null);
     form.reset();
     fetchSlides();
   }
@@ -1383,6 +1429,7 @@ function FlyersSection() {
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [imagemFile, setImagemFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -1407,7 +1454,7 @@ function FlyersSection() {
     setLoading(true);
     const { data, error } = await supabase
       .from("flyers")
-      .select("*")
+      .select("id, titulo, descricao, imagem, link, tipo, ativo, ordem, criado_em")
       .order("ordem", { ascending: true });
     if (error) setErro(error.message);
     else setFlyers(data || []);
@@ -1417,6 +1464,7 @@ function FlyersSection() {
   function openNewForm() {
     setEditingFlyer(null);
     setImagemPreview(null);
+    setImagemFile(null);
     form.reset({
       titulo: "",
       descricao: "",
@@ -1434,6 +1482,7 @@ function FlyersSection() {
   function openEditForm(flyer: Flyer) {
     setEditingFlyer(flyer);
     setImagemPreview(flyer.imagem || null);
+    setImagemFile(null);
     form.reset({
       titulo: flyer.titulo || "",
       descricao: flyer.descricao || "",
@@ -1464,11 +1513,10 @@ function FlyersSection() {
     }
     const isAnimated = file.type === "image/gif" || file.type === "image/webp";
     if (isAnimated) form.setValue("tipo", "animado");
+    setImagemFile(file);
     const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      setImagemPreview(base64);
-      form.setValue("imagem", base64);
+      setImagemPreview(event.target?.result as string);
     };
     reader.readAsDataURL(file);
   }
@@ -1498,6 +1546,7 @@ function FlyersSection() {
 
   function removeImage() {
     setImagemPreview(null);
+    setImagemFile(null);
     form.setValue("imagem", "");
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
@@ -1505,10 +1554,29 @@ function FlyersSection() {
   async function onSubmit(data: FlyerFormData) {
     setErro("");
     setSucesso("");
+
+    let imagemUrl = "";
+    if (imagemFile) {
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(imagemFile);
+        });
+        imagemUrl = await uploadImage("flyers", dataUrl);
+      } catch (err) {
+        setErro(err instanceof Error ? err.message : "Erro ao enviar imagem");
+        return;
+      }
+    } else if (imagemPreview) {
+      imagemUrl = imagemPreview;
+    }
+
     const flyerData = {
       titulo: data.titulo || "",
       descricao: data.descricao || "",
-      imagem: data.imagem,
+      imagem: imagemUrl,
       link: data.link || "",
       tipo: data.tipo,
       ativo: data.ativo,
@@ -1529,6 +1597,7 @@ function FlyersSection() {
     setShowForm(false);
     setEditingFlyer(null);
     setImagemPreview(null);
+    setImagemFile(null);
     form.reset();
     fetchFlyers();
   }

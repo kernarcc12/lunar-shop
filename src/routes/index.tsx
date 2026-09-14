@@ -1,12 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { createFileRoute, useLoaderData } from "@tanstack/react-router";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { ShieldCheck, Truck, CreditCard, Sparkles } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
 import { Slideshow } from "@/components/store/Slideshow";
 import { categorias, type Product } from "@/data/products";
+import { getServerSupabase } from "@/lib/supabase-server";
 import { supabase } from "@/lib/supabase";
+
+const PAGE_SIZE = 20;
+const PRODUTO_COLUMNS = "id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,24 +29,49 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+  loader: async () => {
+    const supabase = getServerSupabase();
+    const { data } = await supabase
+      .from("produtos")
+      .select(PRODUTO_COLUMNS)
+      .order("criado_em", { ascending: false })
+      .limit(PAGE_SIZE);
+    return { produtos: (data ?? []) as Product[] };
+  },
   component: Home,
 });
 
 function Home() {
-  const [produtos, setProdutos] = useState<Product[]>([]);
+  const initialProdutos = useLoaderData({ from: "/" }).produtos;
 
-  useEffect(() => {
-    async function fetchProdutos() {
+  const {
+    data,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["produtos", "catalogo"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const from = pageParam * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
       const { data } = await supabase
         .from("produtos")
-        .select("*")
-        .order("criado_em", { ascending: false });
-      if (data) setProdutos(data);
-    }
-    fetchProdutos();
-  }, []);
+        .select(PRODUTO_COLUMNS)
+        .order("criado_em", { ascending: false })
+        .range(from, to);
+      return (data ?? []) as Product[];
+    },
+    getNextPageParam: (lastPage: Product[], allPages: Product[][]) => {
+      if (lastPage.length < PAGE_SIZE) return undefined;
+      return allPages.length;
+    },
+    initialData: { pages: [initialProdutos], pageParams: [0] },
+    staleTime: 5 * 60 * 1000,
+    initialPageParam: 0,
+  });
 
-  const ofertas = produtos.filter((p) => p.precoAntigo);
+  const produtos = data?.pages.flatMap((page: Product[]) => page) ?? initialProdutos;
+  const ofertas = produtos.filter((p: Product) => p.precoAntigo);
 
   return (
     <div className="min-h-screen bg-background">
@@ -99,26 +128,38 @@ function Home() {
             <span className="text-sm text-gold-deep">Promoções por tempo limitado</span>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {ofertas.map((p) => (
+            {ofertas.map((p: Product) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
         </section>
 
         {categorias.map((cat) => {
-          const lista = produtos.filter((p) => p.categoria === cat);
+          const lista = produtos.filter((p: Product) => p.categoria === cat);
           if (!lista.length) return null;
           return (
             <section key={cat} id={cat.toLowerCase().replace(/\W+/g, "-")} className="mt-10">
               <h2 className="mb-4 text-xl font-semibold text-foreground">{cat}</h2>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {lista.map((p) => (
+                {lista.map((p: Product) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
             </section>
           );
         })}
+
+        {hasNextPage && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="rounded-md border border-border bg-card px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50"
+            >
+              {isFetchingNextPage ? "Carregando..." : "Carregar mais produtos"}
+            </button>
+          </div>
+        )}
       </main>
 
       <Footer />

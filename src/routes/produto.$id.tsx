@@ -1,5 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { createFileRoute, Link, useNavigate, useLoaderData } from "@tanstack/react-router";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Star, Truck, ShieldCheck, RotateCcw, Send } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
@@ -7,6 +8,7 @@ import { ProductCard } from "@/components/store/ProductCard";
 import { WhatsAppButton } from "@/components/store/WhatsAppButton";
 import { brl, type Product } from "@/data/products";
 import { supabase } from "@/lib/supabase";
+import { getServerSupabase } from "@/lib/supabase-server";
 import { addToCart } from "@/lib/cart";
 
 type Avaliacao = {
@@ -45,43 +47,81 @@ export const Route = createFileRoute("/produto/$id")({
       { title: "Produto | Lunar Produtos" },
     ],
   }),
+  loader: async ({ params }) => {
+    const supabase = getServerSupabase();
+    const [produtoRes, relacionadosRes] = await Promise.all([
+      supabase
+        .from("produtos")
+        .select("id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao")
+        .eq("id", params.id)
+        .single(),
+      supabase
+        .from("produtos")
+        .select("id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao")
+        .neq("id", params.id)
+        .limit(4),
+    ]);
+    return {
+      produto: produtoRes.data as Product | null,
+      relacionados: (relacionadosRes.data ?? []) as Product[],
+    };
+  },
   component: ProdutoPage,
 });
 
 function ProdutoPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const [produto, setProduto] = useState<Product | null>(null);
-  const [relacionados, setRelacionados] = useState<Product[]>([]);
-  const [carregando, setCarregando] = useState(true);
-  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const initial = useLoaderData({ from: "/produto/$id" });
+
+  const { data: produto } = useQuery({
+    queryKey: ["produto", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("produtos")
+        .select("id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao")
+        .eq("id", id)
+        .single();
+      return data as Product | null;
+    },
+    initialData: initial.produto,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: relacionados } = useQuery({
+    queryKey: ["produtos", "relacionados", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("produtos")
+        .select("id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao")
+        .neq("id", id)
+        .limit(4);
+      return (data ?? []) as Product[];
+    },
+    initialData: initial.relacionados,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>(() => carregarAvaliacoes(id));
   const [estrelasSelecionadas, setEstrelasSelecionadas] = useState(5);
   const [nomeAvaliador, setNomeAvaliador] = useState("");
   const [comentario, setComentario] = useState("");
   const [enviado, setEnviado] = useState(false);
 
-  useEffect(() => {
-    async function carregar() {
-      const { data } = await supabase
-        .from("produtos")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (data) {
-        setProduto(data);
-        const { data: todos } = await supabase
-          .from("produtos")
-          .select("*")
-          .neq("id", id)
-          .limit(4);
-        setRelacionados(todos || []);
-      }
-      setAvaliacoes(carregarAvaliacoes(id));
-      setCarregando(false);
-    }
-    carregar();
-  }, [id]);
+  if (!produto) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-7xl px-4 py-16 text-center">
+          <h1 className="text-2xl font-semibold text-foreground">Produto não encontrado</h1>
+          <Link to="/" className="mt-4 inline-block text-gold hover:underline">
+            Voltar à loja
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   function enviarAvaliacao() {
     if (!nomeAvaliador.trim() || !comentario.trim()) return;
@@ -104,33 +144,6 @@ function ProdutoPage() {
     setTimeout(() => setEnviado(false), 3000);
   }
 
-  if (carregando) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="mx-auto max-w-7xl px-4 py-16 text-center">
-          <p className="text-muted-foreground">Carregando produto...</p>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!produto) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="mx-auto max-w-7xl px-4 py-16 text-center">
-          <h1 className="text-2xl font-semibold text-foreground">Produto não encontrado</h1>
-          <Link to="/" className="mt-4 inline-block text-gold hover:underline">
-            Voltar à loja
-          </Link>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -149,6 +162,7 @@ function ProdutoPage() {
               alt={produto.nome}
               width={800}
               height={800}
+              loading="lazy"
               className="mx-auto h-[420px] w-full object-contain"
             />
           </div>
@@ -328,7 +342,7 @@ function ProdutoPage() {
         <section className="mt-10">
           <h2 className="mb-4 text-xl font-semibold text-foreground">Quem viu também comprou</h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {relacionados.map((p) => (
+            {relacionados.map((p: Product) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

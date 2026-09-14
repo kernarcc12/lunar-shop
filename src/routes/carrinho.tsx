@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Trash2, ShoppingBag, MessageCircle, Check } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
@@ -41,23 +42,22 @@ function Carrinho() {
   const items = useCart();
   const [pedidoFeito, setPedidoFeito] = useState(false);
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
-  const [produtosMap, setProdutosMap] = useState<Map<string, Product>>(new Map());
 
-  useEffect(() => {
-    async function carregarProdutos() {
-      if (items.length === 0) return;
-      const ids = items.map((i) => i.id);
+  const ids = useMemo(() => items.map((i) => i.id), [items]);
+
+  const { data: produtosMap = new Map() } = useQuery({
+    queryKey: ["carrinho", ids.sort().join(",")],
+    queryFn: async () => {
+      if (ids.length === 0) return new Map<string, Product>();
       const { data } = await supabase
         .from("produtos")
-        .select("*")
+        .select("id, nome, preco, precoAntigo, imagem, parcelas")
         .in("id", ids);
-      if (data) {
-        const map = new Map(data.map((p) => [p.id, p]));
-        setProdutosMap(map);
-      }
-    }
-    carregarProdutos();
-  }, [items]);
+      return new Map((data ?? []).map((p) => [p.id, p])) as Map<string, Product>;
+    },
+    enabled: ids.length > 0,
+    staleTime: 10 * 60 * 1000,
+  });
 
   const linhas = items
     .map((i) => ({ item: i, produto: produtosMap.get(i.id) || null }))

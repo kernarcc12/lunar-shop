@@ -8,6 +8,7 @@ import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { uploadImage } from "@/lib/upload";
 import {
   Form,
   FormControl,
@@ -59,7 +60,9 @@ function EditarProduto() {
   const [erro, setErro] = useState("");
   const [salvo, setSalvo] = useState(false);
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [imagemFile, setImagemFile] = useState<File | null>(null);
   const [excluindo, setExcluindo] = useState(false);
+  const [enviando, setEnviando] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormData>({
@@ -130,17 +133,17 @@ function EditarProduto() {
       return;
     }
 
+    setImagemFile(file);
     const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      setImagemPreview(base64);
-      form.setValue("imagem", base64);
+      setImagemPreview(event.target?.result as string);
     };
     reader.readAsDataURL(file);
   }
 
   function removeImage() {
     setImagemPreview(null);
+    setImagemFile(null);
     form.setValue("imagem", "");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -168,6 +171,24 @@ function EditarProduto() {
   async function onSubmit(data: FormData) {
     if (!user) return;
     setErro("");
+    setEnviando(true);
+
+    let imagemUrl = imagemPreview || "";
+    if (imagemFile) {
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(imagemFile);
+        });
+        imagemUrl = await uploadImage("produtos", dataUrl);
+      } catch (err) {
+        setErro(err instanceof Error ? err.message : "Erro ao enviar imagem");
+        setEnviando(false);
+        return;
+      }
+    }
 
     const { error } = await supabase
       .from("produtos")
@@ -176,13 +197,15 @@ function EditarProduto() {
         categoria: data.categoria,
         preco: data.preco,
         preco_antigo: data.precoAntigo && data.precoAntigo > 0 ? data.precoAntigo : null,
-        imagem: data.imagem || "",
+        imagem: imagemUrl,
         parcelas: data.parcelas,
         frete_gratis: data.freteGratis,
         avaliacao: data.avaliacao,
         descricao: data.descricao,
       })
       .eq("id", id);
+
+    setEnviando(false);
 
     if (error) {
       setErro(error.message);
@@ -532,9 +555,10 @@ function EditarProduto() {
                   <Button
                     type="submit"
                     className="bg-brand text-gold hover:bg-brand-soft"
+                    disabled={enviando}
                   >
                     <Save className="mr-2 h-4 w-4" />
-                    Salvar alterações
+                    {enviando ? "Salvando..." : "Salvar alterações"}
                   </Button>
                 </div>
               </div>
