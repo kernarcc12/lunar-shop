@@ -266,7 +266,7 @@ function AdminPage() {
         )}
 
         <aside
-          className={`fixed top-14 bottom-0 z-40 w-60 border-r border-border bg-card transition-transform lg:sticky lg:translate-x-0 ${
+          className={`fixed top-14 bottom-0 z-40 w-64 border-r border-border bg-card transition-transform lg:sticky lg:translate-x-0 ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -281,13 +281,13 @@ function AdminPage() {
                     setSection(item.id);
                     setSidebarOpen(false);
                   }}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
                     active
                       ? "bg-brand text-gold"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5" />
                   {item.label}
                 </button>
               );
@@ -1652,7 +1652,7 @@ function FlyersSection() {
                             <img
                               src={imagemPreview}
                               alt="Preview"
-                              className="h-48 w-80 rounded-lg border border-border object-cover"
+                              className="h-80 w-45 rounded-lg border border-border object-cover"
                             />
                             <button
                               type="button"
@@ -1679,7 +1679,7 @@ function FlyersSection() {
                             onDragLeave={handleDragLeave}
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
-                            className={`flex h-48 w-80 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
+                            className={`flex h-80 w-45 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
                               isDragging
                                 ? "border-gold bg-gold/5"
                                 : "border-border hover:border-gold/50"
@@ -1704,7 +1704,7 @@ function FlyersSection() {
                       </div>
                     </FormControl>
                     <FormDescription>
-                      GIFs e WebP animados são detectados automaticamente.
+                      Recomendado: 1080x1920px (formato vertical). GIFs e WebP animados são detectados automaticamente.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

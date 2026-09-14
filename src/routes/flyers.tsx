@@ -112,7 +112,7 @@ function FlyersPage() {
                     <p className="text-sm text-muted-foreground">Ofertas com mais vida</p>
                   </div>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                   {flyersAnimados.map((flyer) => (
                     <FlyerCard
                       key={flyer.id}
@@ -135,7 +135,7 @@ function FlyersPage() {
                     <p className="text-sm text-muted-foreground">Ofertas estáticas</p>
                   </div>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                   {flyersEstaticos.map((flyer) => (
                     <FlyerCard
                       key={flyer.id}
@@ -156,7 +156,7 @@ function FlyersPage() {
           onClick={() => setSelectedFlyer(null)}
         >
           <div
-            className="relative max-h-[90vh] max-w-4xl overflow-hidden rounded-2xl bg-card shadow-2xl"
+            className="relative max-h-[90vh] w-full max-w-md overflow-hidden rounded-2xl bg-card shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -212,7 +212,7 @@ function FlyerCard({
       className="group relative cursor-pointer overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-gold/50 hover:shadow-lg hover:shadow-gold/5"
       onClick={onClick}
     >
-      <div className="relative aspect-[2/1] overflow-hidden">
+      <div className="relative aspect-[9/16] overflow-hidden">
         <img
           src={flyer.imagem}
           alt={flyer.titulo || "Flyer"}

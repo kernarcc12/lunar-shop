@@ -458,19 +458,11 @@ function AdminFlyers() {
                           <div className="space-y-3">
                             {imagemPreview ? (
                               <div className="relative inline-block">
-                                {form.getValues("tipo") === "animado" ? (
-                                  <img
-                                    src={imagemPreview}
-                                    alt="Preview"
-                                    className="h-48 w-80 rounded-lg border border-border object-cover"
-                                  />
-                                ) : (
-                                  <img
-                                    src={imagemPreview}
-                                    alt="Preview"
-                                    className="h-48 w-80 rounded-lg border border-border object-cover"
-                                  />
-                                )}
+                                <img
+                                  src={imagemPreview}
+                                  alt="Preview"
+                                  className="h-80 w-45 rounded-lg border border-border object-cover"
+                                />
                                 <button
                                   type="button"
                                   onClick={removeImage}
@@ -496,7 +488,7 @@ function AdminFlyers() {
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
                                 onClick={() => fileInputRef.current?.click()}
-                                className={`flex h-48 w-80 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
+                                className={`flex h-80 w-45 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
                                   isDragging
                                     ? "border-gold bg-gold/5"
                                     : "border-border hover:border-gold/50"
@@ -510,7 +502,7 @@ function AdminFlyers() {
                                   JPG, PNG, GIF, WebP ou SVG
                                 </p>
                                 <p className="mt-1 text-xs text-muted-foreground/70">
-                                  GIFs e WebP animados são detectados automaticamente
+                                  Recomendado: 1080x1920px (vertical)
                                 </p>
                               </div>
                             )}
@@ -524,7 +516,7 @@ function AdminFlyers() {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          Imagem do flyer (recomendado: 1200x600px). GIFs e WebP animados são detectados automaticamente como animados.
+                          Imagem do flyer (recomendado: 1080x1920px - formato vertical). GIFs e WebP animados são detectados automaticamente.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
