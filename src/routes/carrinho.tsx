@@ -51,7 +51,7 @@ function Carrinho() {
       if (ids.length === 0) return new Map<string, Product>();
       const { data } = await supabase
         .from("produtos")
-        .select("id, nome, preco, precoAntigo, imagem, parcelas")
+        .select("id, nome, preco, preco_antigo, imagem, parcelas")
         .in("id", ids);
       return new Map((data ?? []).map((p) => [p.id, p])) as Map<string, Product>;
     },

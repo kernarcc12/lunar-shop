@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, useLoaderData } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Star, Truck, ShieldCheck, RotateCcw, Send } from "lucide-react";
@@ -8,7 +8,6 @@ import { ProductCard } from "@/components/store/ProductCard";
 import { WhatsAppButton } from "@/components/store/WhatsAppButton";
 import { brl, type Product } from "@/data/products";
 import { supabase } from "@/lib/supabase";
-import { getServerSupabase } from "@/lib/supabase-server";
 import { addToCart } from "@/lib/cart";
 
 type Avaliacao = {
@@ -41,64 +40,44 @@ function salvarAvaliacao(avaliacao: Avaliacao) {
   localStorage.setItem(REVIEWS_KEY, JSON.stringify(todas));
 }
 
+const PRODUTO_COLUMNS = "id, nome, categoria, preco, preco_antigo, imagem, parcelas, frete_gratis, avaliacao, vendidos, descricao";
+
 export const Route = createFileRoute("/produto/$id")({
   head: () => ({
     meta: [
       { title: "Produto | Lunar Produtos" },
     ],
   }),
-  loader: async ({ params }) => {
-    const supabase = getServerSupabase();
-    const [produtoRes, relacionadosRes] = await Promise.all([
-      supabase
-        .from("produtos")
-        .select("id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao")
-        .eq("id", params.id)
-        .single(),
-      supabase
-        .from("produtos")
-        .select("id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao")
-        .neq("id", params.id)
-        .limit(4),
-    ]);
-    return {
-      produto: produtoRes.data as Product | null,
-      relacionados: (relacionadosRes.data ?? []) as Product[],
-    };
-  },
   component: ProdutoPage,
 });
 
 function ProdutoPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const initial = useLoaderData({ from: "/produto/$id" });
 
-  const { data: produto } = useQuery({
+  const { data: produto, isLoading: loadingProduto } = useQuery({
     queryKey: ["produto", id],
     queryFn: async () => {
       const { data } = await supabase
         .from("produtos")
-        .select("id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao")
+        .select(PRODUTO_COLUMNS)
         .eq("id", id)
         .single();
       return data as Product | null;
     },
-    initialData: initial.produto,
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: relacionados } = useQuery({
+  const { data: relacionados = [] } = useQuery({
     queryKey: ["produtos", "relacionados", id],
     queryFn: async () => {
       const { data } = await supabase
         .from("produtos")
-        .select("id, nome, categoria, preco, precoAntigo, imagem, parcelas, freteGratis, avaliacao, vendidos, descricao")
+        .select(PRODUTO_COLUMNS)
         .neq("id", id)
         .limit(4);
       return (data ?? []) as Product[];
     },
-    initialData: initial.relacionados,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -107,6 +86,18 @@ function ProdutoPage() {
   const [nomeAvaliador, setNomeAvaliador] = useState("");
   const [comentario, setComentario] = useState("");
   const [enviado, setEnviado] = useState(false);
+
+  if (loadingProduto) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-7xl px-4 py-16 text-center">
+          <p className="text-muted-foreground">Carregando produto...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!produto) {
     return (
