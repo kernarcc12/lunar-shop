@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Star, Truck, ShieldCheck, RotateCcw, Send } from "lucide-react";
+import { Star, Truck, ShieldCheck, RotateCcw, Send, Boxes } from "lucide-react";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
@@ -174,6 +174,16 @@ function ProdutoPage() {
             <p className="mt-1 text-success">
               em {produto.parcelas}x {brl(produto.preco / produto.parcelas)} sem juros
             </p>
+
+            {produto.quantidade > 0 ? (
+              <p className="mt-2 flex items-center gap-2 text-sm font-medium text-success">
+                <Boxes className="h-4 w-4" /> {produto.quantidade} em estoque
+              </p>
+            ) : (
+              <p className="mt-2 flex items-center gap-2 text-sm font-medium text-destructive">
+                <Boxes className="h-4 w-4" /> Esgotado
+              </p>
+            )}
 
             <p className="mt-4 flex items-center gap-2 text-sm">
               <Truck className="h-4 w-4 text-success" />

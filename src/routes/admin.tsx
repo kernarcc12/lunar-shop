@@ -90,6 +90,7 @@ const produtoSchema = z.object({
     .or(z.literal("")),
   imagem: z.string().optional(),
   parcelas: z.coerce.number().int().min(1, "Mínimo 1 parcela").max(48, "Máximo 48 parcelas"),
+  quantidade: z.coerce.number().int().min(0, "Quantidade deve ser maior ou igual a zero"),
   freteGratis: z.boolean(),
   avaliacao: z.coerce.number().min(0, "Mínimo 0").max(5, "Máximo 5"),
   descricao: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
@@ -137,6 +138,7 @@ type Produto = {
   frete_gratis: boolean;
   avaliacao: number;
   vendidos: number;
+  quantidade: number;
   descricao: string;
   criado_por: string;
   criado_em: string;
@@ -503,6 +505,7 @@ function ProdutosSection() {
       precoAntigo: "",
       imagem: "",
       parcelas: 1,
+      quantidade: 1,
       freteGratis: false,
       avaliacao: 5,
       descricao: "",
@@ -539,6 +542,7 @@ function ProdutosSection() {
       precoAntigo: "",
       imagem: "",
       parcelas: 1,
+      quantidade: 1,
       freteGratis: false,
       avaliacao: 5,
       descricao: "",
@@ -559,6 +563,7 @@ function ProdutosSection() {
       precoAntigo: produto.preco_antigo || "",
       imagem: produto.imagem || "",
       parcelas: produto.parcelas,
+      quantidade: produto.quantidade,
       freteGratis: produto.frete_gratis,
       avaliacao: produto.avaliacao,
       descricao: produto.descricao,
@@ -620,6 +625,7 @@ function ProdutosSection() {
       preco_antigo: data.precoAntigo && data.precoAntigo > 0 ? data.precoAntigo : null,
       imagem: imagemUrl,
       parcelas: data.parcelas,
+      quantidade: data.quantidade,
       frete_gratis: data.freteGratis,
       avaliacao: data.avaliacao,
       descricao: data.descricao,
@@ -738,7 +744,7 @@ function ProdutosSection() {
                 />
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-3">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <FormField
                   control={form.control}
                   name="preco"
@@ -779,6 +785,19 @@ function ProdutosSection() {
                       <FormLabel>Parcelas</FormLabel>
                       <FormControl>
                         <Input type="number" min={1} max={48} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="quantidade"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantidade em estoque</FormLabel>
+                      <FormControl>
+                        <Input type="number" min={0} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -919,6 +938,7 @@ function ProdutosSection() {
                     Categoria
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">Preço</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Estoque</th>
                   <th className="px-4 py-3 text-right font-medium text-muted-foreground">Ações</th>
                 </tr>
               </thead>
@@ -943,6 +963,13 @@ function ProdutosSection() {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{p.categoria}</td>
                     <td className="px-4 py-3 text-foreground">{brl(p.preco)}</td>
+                    <td className="px-4 py-3">
+                      {p.quantidade > 0 ? (
+                        <span className="font-medium text-success">{p.quantidade}</span>
+                      ) : (
+                        <span className="font-medium text-destructive">Esgotado</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button

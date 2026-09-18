@@ -42,6 +42,7 @@ const schema = z.object({
     .or(z.literal("")),
   imagem: z.string().optional(),
   parcelas: z.coerce.number().int().min(1, "Mínimo 1 parcela").max(48, "Máximo 48 parcelas"),
+  quantidade: z.coerce.number().int().min(0, "Quantidade deve ser maior ou igual a zero"),
   freteGratis: z.boolean(),
   avaliacao: z.coerce.number().min(0, "Mínimo 0").max(5, "Máximo 5"),
   descricao: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
@@ -75,6 +76,7 @@ function CadastrarProduto() {
       precoAntigo: "",
       imagem: "",
       parcelas: 1,
+      quantidade: 1,
       freteGratis: false,
       avaliacao: 5,
       descricao: "",
@@ -136,6 +138,7 @@ function CadastrarProduto() {
       preco_antigo: data.precoAntigo && data.precoAntigo > 0 ? data.precoAntigo : null,
       imagem: imagemUrl,
       parcelas: data.parcelas,
+      quantidade: data.quantidade,
       frete_gratis: data.freteGratis,
       avaliacao: data.avaliacao,
       vendidos: 0,
@@ -300,7 +303,7 @@ function CadastrarProduto() {
                 />
               </div>
 
-              <div className="grid gap-6 sm:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-3">
                 <FormField
                   control={form.control}
                   name="preco"
@@ -331,6 +334,20 @@ function CadastrarProduto() {
                         />
                       </FormControl>
                       <FormDescription>Deixe vazio se não houver desconto</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="quantidade"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantidade em estoque</FormLabel>
+                      <FormControl>
+                        <Input type="number" min={0} {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Star, Truck, MessageCircle, Heart, Pencil } from "lucide-react";
+import { Star, Truck, MessageCircle, Heart, Pencil, Boxes } from "lucide-react";
 import { brl, type Product } from "@/data/products";
 import { useAuth } from "@/lib/auth";
 
@@ -62,6 +62,14 @@ export function ProductCard({ product, featured }: { product: Product; featured?
           <p className="text-[10px] text-muted-foreground">
             em {product.parcelas}x {brl(product.preco / product.parcelas)} sem juros
           </p>
+          {product.quantidade > 0 ? (
+            <p className="flex items-center gap-1 text-[10px] font-medium text-success">
+              <Boxes className="h-3.5 w-3.5" />
+              {product.quantidade} em estoque
+            </p>
+          ) : (
+            <p className="text-[10px] font-medium text-destructive">Esgotado</p>
+          )}
           <div className="mt-auto flex items-center gap-3 pt-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Star className="h-3.5 w-3.5 fill-gold text-gold" />

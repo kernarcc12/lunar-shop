@@ -16,10 +16,14 @@ CREATE TABLE IF NOT EXISTS produtos (
   frete_gratis BOOLEAN NOT NULL DEFAULT false,
   avaliacao NUMERIC(2, 1) NOT NULL DEFAULT 5,
   vendidos INTEGER NOT NULL DEFAULT 0,
+  quantidade INTEGER NOT NULL DEFAULT 0,
   descricao TEXT NOT NULL DEFAULT '',
   criado_por UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   criado_em TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Coluna quantidade para instancias ja existentes
+ALTER TABLE produtos ADD COLUMN IF NOT EXISTS quantidade INTEGER NOT NULL DEFAULT 0;
 
 -- 2. Habilitar RLS
 ALTER TABLE produtos ENABLE ROW LEVEL SECURITY;

@@ -9,6 +9,7 @@ export type Product = {
   freteGratis: boolean;
   avaliacao: number;
   vendidos: number;
+  quantidade: number;
   descricao: string;
 };
 
